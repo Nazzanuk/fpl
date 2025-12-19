@@ -59,7 +59,7 @@ const LiveMatchesWidgetInner = async () => {
                 {fixture.team_h_score ?? '-'} : {fixture.team_a_score ?? '-'}
                 </div>
                 <div className={`${styles.time} ${!fixture.finished && fixture.team_h_score !== null ? styles.live : ''}`}>
-                    {fixture.finished ? 'FT' : (fixture.team_h_score !== null ? 'LIVE' : new Date(fixture.kickoff_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}))}
+                    {fixture.finished ? 'FT' : (fixture.team_h_score !== null ? 'LIVE' : `${new Date(fixture.kickoff_time).getUTCHours().toString().padStart(2, '0')}:${new Date(fixture.kickoff_time).getUTCMinutes().toString().padStart(2, '0')}`)}
                 </div>
             </div>
             <div className={`${styles.team} ${styles.away}`}>{getTeamName(fixture.team_a)}</div>

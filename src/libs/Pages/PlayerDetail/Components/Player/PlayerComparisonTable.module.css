@@ -14,6 +14,14 @@
   padding: 0.75rem 1.25rem;
   background: var(--surface-dim);
   border-bottom: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.leftControls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
 }
 
 .filters {
@@ -32,6 +40,7 @@
   letter-spacing: 0.06em;
   cursor: pointer;
   transition: all 0.15s ease;
+  border-radius: 4px;
 }
 
 .filterBtn:hover {
@@ -46,12 +55,36 @@
   border-color: var(--ink);
 }
 
+.searchWrapper {
+  flex: 1;
+  max-width: 300px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+}
+
 .count {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
 .tableWrapper {
@@ -146,6 +179,27 @@
   font-weight: 700;
   color: var(--ink);
   background: rgba(212, 175, 55, 0.08); /* faint gold background */
+}
+
+.newsBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 900;
+  border-radius: 50%;
+  margin-left: 8px;
+  cursor: help;
+  vertical-align: middle;
+}
+
+.unavailable {
+  opacity: 0.6;
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .skeletonTable {

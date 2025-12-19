@@ -125,6 +125,7 @@ export interface PlayerStatSummary {
   readonly lastGwPoints: number;
   readonly matchesPlayed: number;
   readonly injuryStatus: string | null;
+  readonly status: string;
 }
 
 // Re-export shared types

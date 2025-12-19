@@ -12,6 +12,7 @@ import {
   getElementSummary,
   getAllFixtures,
 } from '../Data/Client/FPLApiClient';
+import { getPlayerStatsAggregate } from './AnalyticsEngine';
 
 const limit = pLimit(5); // Concurrency control - max 5 concurrent requests
 
@@ -148,7 +149,9 @@ export async function buildLiveTable(leagueId: number): Promise<LiveScore[]> {
   allPicks.forEach((picks: any) => {
     if (picks?.picks) {
       const starters = picks.picks.filter((p: any) => p.position <= 11);
-      starters.forEach((pick: any) => allPlayerIds.add(pick.element));
+      starters.forEach((pick: any) => {
+        allPlayerIds.add(pick.element);
+      });
     }
   });
 
@@ -564,118 +567,111 @@ function getPositionName(elementType: number): string {
  */
 export async function getBestXI(leagueId: number) {
   const bootstrap = await getBootstrapStatic();
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current);
   
-  // Fetch live stats for current GW points
-  const liveStats = currentEvent ? await getEventLive(currentEvent.id) : null;
+  // Identify top candidates by total points and ppg for trimean fetching
+  const topTotalIds = bootstrap.elements
+    .sort((a: any, b: any) => b.total_points - a.total_points)
+    .slice(0, 100)
+    .map((el: any) => el.id);
+  
+  const topPpgIds = bootstrap.elements
+    .filter((el: any) => el.minutes > 90)
+    .sort((a: any, b: any) => parseFloat(b.points_per_game) - parseFloat(a.points_per_game))
+    .slice(0, 100)
+    .map((el: any) => el.id);
 
-  // Calculate value score for each player
-  const scoredPlayers = bootstrap.elements.map((element: any) => {
-    const team = bootstrap.teams.find((t: any) => t.id === element.team);
-    const form = parseFloat(element.form) || 0;
-    const cost = element.now_cost / 10;
-    const pointsPerGame = parseFloat(element.points_per_game) || 0;
-    // Value score: combine points per game with efficiency (points per cost)
-    const valueScore = cost > 0 ? pointsPerGame + (element.total_points / cost) : pointsPerGame;
-    // Trimean: use points_per_game as season-long average (better than form for consistency)
-    const trimean = pointsPerGame;
-    
-    // Get current GW points from live stats
-    const liveData = liveStats?.elements?.find((el: any) => el.id === element.id);
-    const gwPoints = liveData?.stats?.total_points || 0;
+  const idsToProcess = Array.from(new Set([...topTotalIds, ...topPpgIds]));
+  
+  // Use existing aggregate service which includes caching and real trimean
+  const aggregatedPlayers = await getPlayerStatsAggregate(idsToProcess);
+  
+  // Format into locally required structure
+  const candidates = aggregatedPlayers
+    .filter((p: any) => p && p.status === 'a')
+    .map((p: any) => {
+      let positionNumber = 3;
+      if (p.position === 'GKP') positionNumber = 1;
+      else if (p.position === 'DEF') positionNumber = 2;
+      else if (p.position === 'FWD') positionNumber = 4;
 
-    return {
-      id: element.id,
-      webName: element.web_name,
-      teamId: element.team,
-      teamName: team?.short_name || '',
-      teamShortName: team?.short_name || '',
-      position: getPositionName(element.element_type), // Convert to string: 'GKP', 'DEF', 'MID', 'FWD'
-      positionNumber: element.element_type, // Keep number for filtering: 1=GK, 2=DEF, 3=MID, 4=FWD
-      cost,
-      totalPoints: element.total_points,
-      form,
-      pointsPerGame,
-      valueScore,
-      trimean,
-      gwPoints,
-      status: element.status,
-    };
-  });
+      return {
+        ...p,
+        positionNumber,
+      };
+    });
 
-  // Filter out unavailable players
-  const availablePlayers = scoredPlayers.filter((p: any) => p.status === 'a');
-
-  // Greedy selection algorithm
-  const BUDGET = 100.0;
+  // Pick Absolute Best 15 (Ignoring budget)
   const squad: any[] = [];
-  let remainingBudget = BUDGET;
-
-  // Position requirements: 2 GK, 5 DEF, 5 MID, 3 FWD
   const positionLimits = { 1: 2, 2: 5, 3: 5, 4: 3 };
   const positionCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
   const teamCounts: Record<number, number> = {};
 
-  // Sort by value score descending
-  const sortedPlayers = [...availablePlayers].sort((a, b) => b.valueScore - a.valueScore);
+  // Sort by trimean descending
+  const sortedPlayers = [...candidates].sort((a, b) => b.trimean - a.trimean);
 
-  // Select players greedily
   for (const player of sortedPlayers) {
     if (squad.length >= 15) break;
 
     const position = player.positionNumber as 1 | 2 | 3 | 4;
-    const teamId = player.teamId;
+    const teamId = bootstrap.elements.find((e: any) => e.id === player.id)?.team;
 
-    // Check constraints
-    if (positionCounts[position] >= positionLimits[position]) continue; // Position full
-    if ((teamCounts[teamId] || 0) >= 3) continue; // Max 3 per team
-    if (player.cost > remainingBudget) continue; // Over budget
+    if (!teamId) continue;
 
-    // Add player to squad
+    // Constraints: Position full or max 3 per team
+    if (positionCounts[position] >= positionLimits[position]) continue;
+    if ((teamCounts[teamId] || 0) >= 3) continue;
+    
     squad.push(player);
-    remainingBudget -= player.cost;
     positionCounts[position]++;
     teamCounts[teamId] = (teamCounts[teamId] || 0) + 1;
   }
 
-  // Fetch real trimean values for the selected squad
-  const squadIds = squad.map(p => p.id);
-  const trimeanMap = await fetchPlayersTrimean(squadIds);
+  // Select best 11 from 15 for starting lineup by evaluating multiple formations
+  const gks = squad.filter(p => p.position === 'GKP').sort((a, b) => b.trimean - a.trimean);
+  const defs = squad.filter(p => p.position === 'DEF').sort((a, b) => b.trimean - a.trimean);
+  const mids = squad.filter(p => p.position === 'MID').sort((a, b) => b.trimean - a.trimean);
+  const fwds = squad.filter(p => p.position === 'FWD').sort((a, b) => b.trimean - a.trimean);
 
-  // Update squad with real trimean values
-  squad.forEach(player => {
-    player.trimean = trimeanMap.get(player.id) || player.pointsPerGame;
-  });
+  const evaluateFormation = (d: number, m: number, f: number) => {
+    if (d + m + f !== 10) return null;
+    if (defs.length < d || mids.length < m || fwds.length < f || gks.length < 1) return null;
 
-  // Select best 11 from 15 for starting lineup
-  // Always start: 1 GK, then best of remaining positions
-  const gks = squad.filter(p => p.position === 'GKP');
-  const defs = squad.filter(p => p.position === 'DEF').sort((a, b) => b.valueScore - a.valueScore);
-  const mids = squad.filter(p => p.position === 'MID').sort((a, b) => b.valueScore - a.valueScore);
-  const fwds = squad.filter(p => p.position === 'FWD').sort((a, b) => b.valueScore - a.valueScore);
+    const starting11 = [
+      gks[0],
+      ...defs.slice(0, d),
+      ...mids.slice(0, m),
+      ...fwds.slice(0, f)
+    ];
 
-  // Optimal formation: 1 GK, 3-5 DEF, 2-5 MID, 1-3 FWD (must total 11)
-  // Use 4-4-2 as default balanced formation
-  const starting11 = [
-    gks[0], // 1 GK
-    ...defs.slice(0, 4), // 4 DEF
-    ...mids.slice(0, 4), // 4 MID
-    ...fwds.slice(0, 2), // 2 FWD
-  ].filter(Boolean);
+    const totalTrimean = starting11.reduce((sum, p) => sum + p.trimean, 0);
+    return { formation: `${d}-${m}-${f}`, starting11, totalTrimean };
+  };
 
-  const totalCost = squad.reduce((sum, p) => sum + p.cost, 0);
-  const totalPoints = squad.reduce((sum, p) => sum + p.totalPoints, 0);
-  const totalValue = squad.reduce((sum, p) => sum + p.valueScore, 0);
-  const totalTrimean = squad.reduce((sum, p) => sum + p.trimean, 0);
+  const formations = [
+    evaluateFormation(3, 4, 3),
+    evaluateFormation(3, 5, 2),
+    evaluateFormation(4, 4, 2),
+    evaluateFormation(4, 3, 3),
+    evaluateFormation(4, 5, 1),
+    evaluateFormation(5, 3, 2),
+    evaluateFormation(5, 4, 1),
+    evaluateFormation(5, 2, 3),
+  ].filter(Boolean) as { formation: string, starting11: any[], totalTrimean: number }[];
+
+  const bestOption = formations.sort((a, b) => b.totalTrimean - a.totalTrimean)[0] || {
+    formation: '4-4-2',
+    starting11: [gks[0], ...defs.slice(0, 4), ...mids.slice(0, 4), ...fwds.slice(0, 1)].filter(Boolean),
+    totalTrimean: 0
+  };
 
   return {
     players: squad,
-    starting11,
-    totalPoints,
-    totalValue,
-    totalCost,
-    totalTrimean,
-    formation: '4-4-2',
+    starting11: bestOption.starting11,
+    totalPoints: squad.reduce((sum, p) => sum + p.totalPoints, 0),
+    totalValue: squad.reduce((sum, p) => sum + (p.trimean * 10), 0), // Arbitrary value based on trimean
+    totalCost: squad.reduce((sum, p) => sum + p.cost, 0),
+    totalTrimean: bestOption.totalTrimean,
+    formation: bestOption.formation,
   };
 }
 
@@ -691,216 +687,95 @@ export async function getTransferRecommendations(managerId: number) {
     return [];
   }
 
-  // Get manager's current team
+  // 1. Get manager picks
   let currentPicks: any;
   try {
     currentPicks = await getManagerPicks(managerId, currentEvent.id);
-  } catch {
-    return []; // Can't get picks, return empty
+  } catch (error) {
+    console.error(`Failed to get picks for manager ${managerId}:`, error);
+    return [];
   }
 
-  // Fetch all fixtures to analyze next 3 gameweeks
+  // 2. Fetch all required player stats (Manager's team + Potential upgrades)
+  const managerPlayerIds = currentPicks.picks.map((p: any) => p.element);
+  
+  // Heuristic for potential upgrades: top 100 players by trimean/points
+  // We'll use the aggregate service which is cached
+  const topPlayers = await getPlayerStatsAggregate(); // Fetch default top 100
+  const managerPlayers = await getPlayerStatsAggregate(managerPlayerIds);
+  
+  // All candidates for evaluation
+  const allCandidates = [...topPlayers, ...managerPlayers].filter((p, i, self) => 
+    p && p.status === 'a' && self.findIndex(s => s?.id === p.id) === i
+  ) as any[];
+
+  const managerSquad = managerPlayers.filter(Boolean);
+  const bankBalance = (currentPicks.entry_history?.bank || 0) / 10;
+
+  // 3. Analyze Fixtures (Next 3)
   const allFixtures = await getAllFixtures();
   const nextThreeGWs = [currentEvent.id, currentEvent.id + 1, currentEvent.id + 2];
+  const teamFDR = new Map<number, { avg: number; count: number }>();
 
-  // Build fixture difficulty map per team: { teamId -> averageDifficulty }
-  const teamFixtureDifficulty = new Map<number, { avgDifficulty: number; fixtures: number }>();
-
-  allFixtures.forEach((fixture: any) => {
-    if (nextThreeGWs.includes(fixture.event)) {
-      // Home team
-      if (!teamFixtureDifficulty.has(fixture.team_h)) {
-        teamFixtureDifficulty.set(fixture.team_h, { avgDifficulty: 0, fixtures: 0 });
-      }
-      const homeData = teamFixtureDifficulty.get(fixture.team_h)!;
-      homeData.avgDifficulty += fixture.team_h_difficulty;
-      homeData.fixtures += 1;
-
-      // Away team
-      if (!teamFixtureDifficulty.has(fixture.team_a)) {
-        teamFixtureDifficulty.set(fixture.team_a, { avgDifficulty: 0, fixtures: 0 });
-      }
-      const awayData = teamFixtureDifficulty.get(fixture.team_a)!;
-      awayData.avgDifficulty += fixture.team_a_difficulty;
-      awayData.fixtures += 1;
+  allFixtures.forEach((f: any) => {
+    if (nextThreeGWs.includes(f.event)) {
+      [ {t: f.team_h, d: f.team_h_difficulty}, {t: f.team_a, d: f.team_a_difficulty} ].forEach(side => {
+        if (!teamFDR.has(side.t)) teamFDR.set(side.t, { avg: 0, count: 0 });
+        const data = teamFDR.get(side.t)!;
+        data.avg += side.d;
+        data.count += 1;
+      });
     }
   });
 
-  // Calculate average difficulty per team
-  teamFixtureDifficulty.forEach((data, teamId) => {
-    if (data.fixtures > 0) {
-      data.avgDifficulty = data.avgDifficulty / data.fixtures;
-    }
-  });
+  const getAvgFDR = (teamId: number) => {
+    const data = teamFDR.get(teamId);
+    return data && data.count > 0 ? data.avg / data.count : 3.0;
+  };
 
-  const managerSquad = currentPicks.picks.map((pick: any) => {
-    const element = bootstrap.elements.find((e: any) => e.id === pick.element);
-    if (!element) return null;
-
-    const team = bootstrap.teams.find((t: any) => t.id === element.team);
-    const form = parseFloat(element.form) || 0;
-    const cost = element.now_cost / 10;
-    const pointsPerGame = parseFloat(element.points_per_game) || 0;
-    const valueScore = cost > 0 ? pointsPerGame + (element.total_points / cost) : pointsPerGame;
-    const trimean = pointsPerGame;
-
-    return {
-      id: element.id,
-      webName: element.web_name,
-      teamId: element.team,
-      teamName: team?.short_name || '',
-      teamShortName: team?.short_name || '',
-      position: getPositionName(element.element_type), // Convert to string: 'GKP', 'DEF', 'MID', 'FWD'
-      cost,
-      form,
-      pointsPerGame,
-      totalPoints: element.total_points,
-      status: element.status,
-      valueScore,
-      trimean,
-    };
-  }).filter(Boolean);
-
-  // Fetch real trimean values for manager's squad
-  const managerSquadIds = managerSquad.map((p: any) => p.id);
-  const managerTrimeanMap = await fetchPlayersTrimean(managerSquadIds);
-
-  // Update manager squad with real trimean values
-  managerSquad.forEach((player: any) => {
-    player.trimean = managerTrimeanMap.get(player.id) || player.pointsPerGame;
-  });
-
-  // Get all available players as alternatives
-  const allPlayers = bootstrap.elements.map((element: any) => {
-    const team = bootstrap.teams.find((t: any) => t.id === element.team);
-    const form = parseFloat(element.form) || 0;
-    const cost = element.now_cost / 10;
-    const pointsPerGame = parseFloat(element.points_per_game) || 0;
-    const valueScore = cost > 0 ? pointsPerGame + (element.total_points / cost) : pointsPerGame;
-    const trimean = pointsPerGame;
-
-    return {
-      id: element.id,
-      webName: element.web_name,
-      teamId: element.team,
-      teamName: team?.short_name || '',
-      teamShortName: team?.short_name || '',
-      position: getPositionName(element.element_type), // Convert to string: 'GKP', 'DEF', 'MID', 'FWD'
-      cost,
-      form,
-      pointsPerGame,
-      totalPoints: element.total_points,
-      status: element.status,
-      valueScore,
-      trimean,
-    };
-  }).filter((p: any) => p.status === 'a'); // Only available players
-
+  // 4. Generate Recommendations
   const recommendations: any[] = [];
-  const bankBalance = (currentPicks.entry_history?.bank || 0) / 10;
-  const usedPlayerInIds = new Set<number>(); // Track players already recommended as transfers in
-  const usedPlayerOutIds = new Set<number>(); // Track players already recommended as transfers out
 
-  // Check each player in manager's squad for potential upgrades
-  for (const currentPlayer of managerSquad) {
-    // Skip if this player has already been recommended for transfer out
-    if (usedPlayerOutIds.has(currentPlayer.id)) {
-      continue;
-    }
-
-    // Find alternatives in same position
-    const alternatives = allPlayers.filter((p: any) =>
-      p.position === currentPlayer.position &&
-      p.id !== currentPlayer.id &&
-      p.cost <= currentPlayer.cost + bankBalance && // Affordable with current bank
-      !usedPlayerInIds.has(p.id) // Not already recommended as a transfer in
+  for (const current of managerSquad) {
+    const outFDR = getAvgFDR(bootstrap.elements.find((e: any) => e.id === current.id)?.team || 0);
+    
+    const alternatives = allCandidates.filter(alt => 
+      alt.position === current.position && 
+      alt.id !== current.id &&
+      alt.cost <= current.cost + bankBalance
     );
 
-    // Sort by value score
-    const betterAlternatives = alternatives
-      .filter((alt: any) => alt.valueScore > currentPlayer.valueScore * 1.1) // At least 10% better
-      .sort((a: any, b: any) => b.valueScore - a.valueScore)
-      .slice(0, 3); // Top 3 alternatives per position
+    for (const alt of alternatives) {
+      const inFDR = getAvgFDR(bootstrap.elements.find((e: any) => e.id === alt.id)?.team || 0);
+      const fdrImpact = outFDR - inFDR; // Positive = easier fixtures
+      const trimeanDiff = alt.trimean - current.trimean;
+      
+      // Effectiveness score: weighted trimean improvement + fixture bonus
+      const effectiveness = trimeanDiff + (fdrImpact * 0.75);
 
-    for (const alternative of betterAlternatives) {
-      const valueDiff = alternative.valueScore - currentPlayer.valueScore;
-      const costDiff = alternative.cost - currentPlayer.cost;
-
-      // Get fixture difficulty for both players' teams
-      const playerOutFDR = teamFixtureDifficulty.get(currentPlayer.teamId)?.avgDifficulty || 3;
-      const playerInFDR = teamFixtureDifficulty.get(alternative.teamId)?.avgDifficulty || 3;
-
-      // Lower difficulty is better, so positive impact means easier fixtures
-      const fixtureDifficultyImpact = playerOutFDR - playerInFDR;
-
-      recommendations.push({
-        playerOut: currentPlayer,
-        playerIn: alternative,
-        reasoning: `${alternative.webName} has significantly better value (${valueDiff.toFixed(1)} higher value score) and is ${costDiff >= 0 ? `£${costDiff.toFixed(1)}m more` : `£${Math.abs(costDiff).toFixed(1)}m less`}.`,
-        priority: Math.round(valueDiff * 10),
-        trimeanDiff: valueDiff,
-        costDiff,
-        fixtureDifficultyImpact,
-        playerOutFDR,
-        playerInFDR,
-      });
-
-      // Mark players as used so they can't be recommended again
-      usedPlayerInIds.add(alternative.id);
-      usedPlayerOutIds.add(currentPlayer.id);
-
-      // Once we find a good upgrade for this player, move to next player in squad
-      break;
-    }
-  }
-
-  // Sort by priority and take top 15 for trimean fetching
-  const topRecommendations = recommendations
-    .sort((a, b) => b.priority - a.priority)
-    .slice(0, 15);
-
-  // Fetch real trimean for playerIn alternatives (only the ones in recommendations)
-  const alternativeIds = [...new Set(topRecommendations.map(r => r.playerIn.id))];
-  const alternativeTrimeanMap = await fetchPlayersTrimean(alternativeIds);
-
-  // Update recommendations with real trimean values
-  topRecommendations.forEach((rec: any) => {
-    const realTrimean = alternativeTrimeanMap.get(rec.playerIn.id);
-    if (realTrimean !== undefined) {
-      rec.playerIn.trimean = realTrimean;
-    }
-
-    // Recalculate trimeanDiff with real values
-    rec.trimeanDiff = rec.playerIn.trimean - rec.playerOut.trimean;
-
-    // Calculate effectiveness score: trimean improvement + fixture difficulty bonus
-    // Lower FDR is better, so positive impact (easier fixtures) adds to effectiveness
-    rec.effectivenessScore = rec.trimeanDiff + (rec.fixtureDifficultyImpact * 0.5);
-  });
-
-  // Sort by effectiveness (best bang for buck) and filter for budget constraints
-  const sortedByEffectiveness = topRecommendations
-    .filter((rec: any) => rec.trimeanDiff > 0) // Only positive improvements
-    .sort((a, b) => b.effectivenessScore - a.effectivenessScore);
-
-  // Ensure budget constraints: player can afford all recommended transfers
-  const affordableRecommendations: any[] = [];
-  let runningBank = bankBalance;
-
-  for (const rec of sortedByEffectiveness) {
-    const netCost = rec.costDiff; // Positive = costs money, Negative = saves money
-
-    // Check if this transfer is affordable with current running bank
-    if (netCost <= runningBank) {
-      affordableRecommendations.push(rec);
-      runningBank -= netCost; // Update running bank balance
-
-      // Limit to 5 most effective recommendations
-      if (affordableRecommendations.length >= 5) {
-        break;
+      if (effectiveness > 0.1) { // Only suggest meaningful upgrades
+        recommendations.push({
+          playerOut: current,
+          playerIn: alt,
+          trimeanDiff,
+          costDiff: alt.cost - current.cost,
+          fixtureDifficultyImpact: fdrImpact,
+          playerOutFDR: outFDR,
+          playerInFDR: inFDR,
+          effectivenessScore: effectiveness,
+          priority: Math.round(effectiveness * 10),
+          reasoning: `${alt.webName} is performing better and has ${fdrImpact > 0 ? 'easier' : 'similar'} fixtures.`
+        });
       }
     }
   }
 
-  return affordableRecommendations;
+  // 5. Finalize top 5 (Greeedy selection to respect budget and avoid overlap)
+  return recommendations
+    .sort((a, b) => b.effectivenessScore - a.effectivenessScore)
+    .filter((rec, i, self) => 
+      self.findIndex(s => s.playerIn.id === rec.playerIn.id) === i &&
+      self.findIndex(s => s.playerOut.id === rec.playerOut.id) === i
+    )
+    .slice(0, 5);
 }

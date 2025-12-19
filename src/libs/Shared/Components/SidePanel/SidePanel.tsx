@@ -44,7 +44,8 @@ const LiveMatchesInner = async () => {
               </>
             ) : (
               <span className={styles.time}>
-                {new Date(f.kickoff_time).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                {new Date(f.kickoff_time).getUTCHours().toString().padStart(2, '0')}:
+                {new Date(f.kickoff_time).getUTCMinutes().toString().padStart(2, '0')}
               </span>
             )}
           </div>

@@ -108,7 +108,7 @@ const OwnershipGroup = ({ title, desc, players, colorClass }: GroupProps) => {
                     style={{ width: `${player.ownershipPercent}%` }}
                   />
                 </span>
-                <span className={styles.ownershipNum}>{player.ownershipPercent}%</span>
+                <span className={styles.ownershipNum}>{Math.round(player.ownershipPercent)}%</span>
               </div>
               {captainCount > 0 && (
                 <div className={styles.captainInfo}>

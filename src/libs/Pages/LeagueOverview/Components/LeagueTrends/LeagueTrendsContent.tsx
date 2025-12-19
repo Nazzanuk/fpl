@@ -21,7 +21,7 @@ export const LeagueTrendsContent = ({ trends }: Props) => {
     new Set(trends.slice(0, 5).map(t => t.managerId))
   );
 
-  const gameweeks = trends[0]?.history.map(h => h.event) || [];
+  const gameweeks = useMemo(() => trends[0]?.history.map(h => h.event) || [], [trends]);
   const maxGw = Math.max(...gameweeks, 1);
 
   const chartData = useMemo(() => {
@@ -139,6 +139,7 @@ export const LeagueTrendsContent = ({ trends }: Props) => {
       <div className={styles.controls}>
         <div className={styles.chartToggle}>
           <button
+            type="button"
             className={styles.toggleBtn}
             data-active={chartType === 'rank'}
             onClick={() => setChartType('rank')}
@@ -146,6 +147,7 @@ export const LeagueTrendsContent = ({ trends }: Props) => {
             League Rank
           </button>
           <button
+            type="button"
             className={styles.toggleBtn}
             data-active={chartType === 'total'}
             onClick={() => setChartType('total')}
@@ -153,6 +155,7 @@ export const LeagueTrendsContent = ({ trends }: Props) => {
             Total Points
           </button>
           <button
+            type="button"
             className={styles.toggleBtn}
             data-active={chartType === 'weekly'}
             onClick={() => setChartType('weekly')}
@@ -232,6 +235,7 @@ export const LeagueTrendsContent = ({ trends }: Props) => {
             return (
               <button
                 key={trend.managerId}
+                type="button"
                 className={styles.legendItem}
                 data-selected={isSelected}
                 onClick={() => toggleManager(trend.managerId)}

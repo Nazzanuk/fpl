@@ -32,7 +32,7 @@ export const ManagerHistoryContent = ({ data }: Props) => {
           <span className={styles.statLabel}>Worst GW{data.worstGw.event}</span>
         </div>
         <div className={styles.statCard}>
-          <span className={styles.statValue}>-{data.totalTransfersCost}</span>
+          <span className={styles.statValue}>{data.totalTransfersCost > 0 ? `-${data.totalTransfersCost}` : '0'}</span>
           <span className={styles.statLabel}>Transfer Costs</span>
         </div>
       </div>

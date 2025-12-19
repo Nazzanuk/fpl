@@ -77,7 +77,6 @@ export async function getLeagueTrends(leagueId: number): Promise<LeagueTrend[]> 
     getLeagueManagers(leagueId),
   ]);
 
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current);
   const managers = leagueData.standings.results;
 
   // Fetch manager histories
@@ -86,19 +85,27 @@ export async function getLeagueTrends(leagueId: number): Promise<LeagueTrend[]> 
   );
 
   // Build trends array
-  return managers.map((manager: any, index: number) => {
-    const history = histories[index];
+  return managers.map((manager: any, mIdx: number) => {
+    const history = histories[mIdx];
 
     return {
       managerId: manager.entry,
       managerName: manager.player_name,
       teamName: manager.entry_name,
-      history: history.current.map((gw: any) => ({
-        event: gw.event,
-        points: gw.points,
-        totalPoints: gw.total_points,
-        rank: gw.rank || 0,
-      })),
+      history: history.current.map((gw: any, gwIdx: number) => {
+        // Calculate rank relative to other managers in the league at this gameweek
+        const leagueRank = histories.reduce((rank, otherHist) => {
+          const otherTotal = otherHist.current[gwIdx]?.total_points || 0;
+          return otherTotal > gw.total_points ? rank + 1 : rank;
+        }, 1);
+
+        return {
+          event: gw.event,
+          points: gw.points,
+          totalPoints: gw.total_points,
+          rank: leagueRank,
+        };
+      }),
     };
   });
 }
@@ -169,41 +176,53 @@ export async function getManagerHistoryData(managerId: number, leagueId?: number
 }
 
 /**
+ * In-memory cache for player statistics to avoid redundant fetch calls
+ * Valid for the duration of the server-side request/lambda
+ */
+const playerStatsCache = new Map<number, { median: number; trimean: number }>();
+
+/**
  * Get aggregated player statistics with real Tukey's Trimean
  */
 export async function getPlayerStatsAggregate(elementIds?: number[]) {
   const bootstrap = await getBootstrapStatic();
 
-  // If no elementIds provided, return top 20 players by total points
+  // If no elementIds provided, return top 100 players by total points for a better initial view
   const idsToProcess = elementIds || bootstrap.elements
     .sort((a: any, b: any) => b.total_points - a.total_points)
-    .slice(0, 20)
+    .slice(0, 100)
     .map((el: any) => el.id);
 
-  // Fetch historical data for all players in parallel
-  const historicalData = await Promise.all(
-    idsToProcess.map((id: number) => limit(async () => {
-      try {
-        const summary = await getElementSummary(id);
-        // Only include gameweeks where the player actually played (minutes > 0)
-        const gameweekPoints = summary.history
-          .filter((gw: any) => gw.minutes > 0)
-          .map((gw: any) => gw.total_points);
-        return {
-          id,
-          gameweekPoints,
-          median: calculateMedian(gameweekPoints),
-          trimean: calculateTrimean(gameweekPoints),
-        };
-      } catch (error) {
-        console.error(`Failed to fetch history for player ${id}:`, error);
-        return { id, gameweekPoints: [], median: 0, trimean: 0 };
-      }
-    }))
-  );
+  // Identify which IDs are already in cache
+  const uncachedIds = idsToProcess.filter((id: number) => !playerStatsCache.has(id));
 
-  // Create a map for quick lookup
-  const statsMap = new Map(historicalData.map(h => [h.id, h]));
+  if (uncachedIds.length > 0) {
+    // Fetch historical data for uncached players in parallel
+    await Promise.all(
+      uncachedIds.map((id: number) => limit(async () => {
+        try {
+          const summary = await getElementSummary(id);
+          // Only include gameweeks where the player actually played (minutes > 0)
+          const gameweekPoints = summary.history
+            .filter((gw: any) => gw.minutes > 0)
+            .map((gw: any) => gw.total_points);
+          
+          const stats = {
+            median: calculateMedian(gameweekPoints),
+            trimean: calculateTrimean(gameweekPoints),
+          };
+          
+          playerStatsCache.set(id, stats);
+          return { id, ...stats };
+        } catch (error) {
+          console.error(`Failed to fetch history for player ${id}:`, error);
+          const stats = { median: 0, trimean: 0 };
+          playerStatsCache.set(id, stats);
+          return { id, ...stats };
+        }
+      }))
+    );
+  }
 
   return idsToProcess.map((elementId: number) => {
     const element = bootstrap.elements.find((el: any) => el.id === elementId);
@@ -211,7 +230,7 @@ export async function getPlayerStatsAggregate(elementIds?: number[]) {
 
     const team = bootstrap.teams.find((t: any) => t.id === element.team);
     const pointsPerGame = parseFloat(element.points_per_game) || 0;
-    const stats = statsMap.get(elementId);
+    const stats = playerStatsCache.get(elementId);
 
     return {
       id: element.id,
@@ -222,18 +241,14 @@ export async function getPlayerStatsAggregate(elementIds?: number[]) {
       cost: element.now_cost / 10,
       totalPoints: element.total_points,
       averagePoints: pointsPerGame,
-      medianPoints: stats?.median || pointsPerGame,
-      trimean: stats?.trimean || pointsPerGame,
+      medianPoints: stats?.median !== undefined ? stats.median : pointsPerGame,
+      trimean: stats?.trimean !== undefined ? stats.trimean : pointsPerGame,
       lastGwPoints: element.event_points || 0,
       matchesPlayed: element.minutes > 0 ? Math.floor(element.minutes / 90) : 0,
       injuryStatus: element.news || null,
+      status: element.status, // 'a' = available, 'i' = injured, etc.
     };
   }).filter(Boolean);
-}
-
-function average(numbers: number[]): number {
-  if (numbers.length === 0) return 0;
-  return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
 }
 
 function getPositionName(elementType: number): string {

@@ -48,7 +48,7 @@ const UpcomingFixturesWidgetInner = async () => {
               {getTeamName(fixture.team_h)} vs {getTeamName(fixture.team_a)}
             </div>
             <div className={styles.date}>
-              {new Date(fixture.kickoff_time).toLocaleDateString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date(fixture.kickoff_time).getUTCDay()]} {new Date(fixture.kickoff_time).getUTCHours().toString().padStart(2, '0')}:{new Date(fixture.kickoff_time).getUTCMinutes().toString().padStart(2, '0')}
             </div>
           </div>
         ))}

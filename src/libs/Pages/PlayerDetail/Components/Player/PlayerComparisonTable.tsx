@@ -15,6 +15,7 @@ export const PlayerComparisonTable = ({ players }: Props) => {
   const [sortField, setSortField] = useState<SortField>('medianPoints');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [filterPos, setFilterPos] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -25,19 +26,29 @@ export const PlayerComparisonTable = ({ players }: Props) => {
     }
   };
 
-  const sortedPlayers = [...players]
-    .filter(p => filterPos === 'ALL' || p.position === filterPos)
+  const filteredPlayers = players.filter(p => {
+    const matchesPos = filterPos === 'ALL' || p.position === filterPos;
+    const matchesSearch = searchQuery === '' || 
+      p.webName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.teamName.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesPos && matchesSearch;
+  });
+
+  const sortedPlayers = [...filteredPlayers]
     .sort((a, b) => {
       const valA = a[sortField];
       const valB = b[sortField];
       
       if (typeof valA === 'string' && typeof valB === 'string') {
-        return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        const res = valA.localeCompare(valB);
+        return sortDirection === 'asc' ? res : -res;
       }
       
       // Numbers
-      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      const numA = Number(valA);
+      const numB = Number(valB);
+      if (numA < numB) return sortDirection === 'asc' ? -1 : 1;
+      if (numA > numB) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
 
@@ -49,42 +60,53 @@ export const PlayerComparisonTable = ({ players }: Props) => {
   return (
     <div className={styles.container}>
       <div className={styles.controls}>
-        <div className={styles.filters}>
-          <button 
-            type="button"
-            className={`${styles.filterBtn} ${filterPos === 'ALL' ? styles.active : ''}`}
-            onClick={() => setFilterPos('ALL')}
-          >
-            All
-          </button>
-          <button 
-            type="button"
-            className={`${styles.filterBtn} ${filterPos === 'GKP' ? styles.active : ''}`}
-            onClick={() => setFilterPos('GKP')}
-          >
-            GKP
-          </button>
-          <button 
-            type="button"
-            className={`${styles.filterBtn} ${filterPos === 'DEF' ? styles.active : ''}`}
-            onClick={() => setFilterPos('DEF')}
-          >
-            DEF
-          </button>
-          <button 
-            type="button"
-            className={`${styles.filterBtn} ${filterPos === 'MID' ? styles.active : ''}`}
-            onClick={() => setFilterPos('MID')}
-          >
-            MID
-          </button>
-          <button 
-            type="button"
-            className={`${styles.filterBtn} ${filterPos === 'FWD' ? styles.active : ''}`}
-            onClick={() => setFilterPos('FWD')}
-          >
-            FWD
-          </button>
+        <div className={styles.leftControls}>
+          <div className={styles.filters}>
+            <button 
+              type="button"
+              className={`${styles.filterBtn} ${filterPos === 'ALL' ? styles.active : ''}`}
+              onClick={() => setFilterPos('ALL')}
+            >
+              All
+            </button>
+            <button 
+              type="button"
+              className={`${styles.filterBtn} ${filterPos === 'GKP' ? styles.active : ''}`}
+              onClick={() => setFilterPos('GKP')}
+            >
+              GKP
+            </button>
+            <button 
+              type="button"
+              className={`${styles.filterBtn} ${filterPos === 'DEF' ? styles.active : ''}`}
+              onClick={() => setFilterPos('DEF')}
+            >
+              DEF
+            </button>
+            <button 
+              type="button"
+              className={`${styles.filterBtn} ${filterPos === 'MID' ? styles.active : ''}`}
+              onClick={() => setFilterPos('MID')}
+            >
+              MID
+            </button>
+            <button 
+              type="button"
+              className={`${styles.filterBtn} ${filterPos === 'FWD' ? styles.active : ''}`}
+              onClick={() => setFilterPos('FWD')}
+            >
+              FWD
+            </button>
+          </div>
+          <div className={styles.searchWrapper}>
+            <input 
+              type="text" 
+              placeholder="Search players..." 
+              className={styles.searchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
         <div className={styles.count}>
           Showing {sortedPlayers.length} players
@@ -109,8 +131,11 @@ export const PlayerComparisonTable = ({ players }: Props) => {
           </thead>
           <tbody>
             {sortedPlayers.map(player => (
-              <tr key={player.id}>
-                <td className={styles.playerName}>{player.webName}</td>
+              <tr key={player.id} className={player.status !== 'a' ? styles.unavailable : ''}>
+                <td className={styles.playerName}>
+                  {player.webName}
+                  {player.injuryStatus && <span className={styles.newsBadge} title={player.injuryStatus}>!</span>}
+                </td>
                 <td className={styles.teamName}>{player.teamShortName}</td>
                 <td className={styles.position}>{player.position}</td>
                 <td className={styles.rightAlign}>£{player.cost.toFixed(1)}</td>
