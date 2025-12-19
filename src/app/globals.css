@@ -1,33 +1,63 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Premium Sports Broadcast Color Palette */
+  --ink: #0a0f1c;           /* Deep navy - primary dark */
+  --ink-light: #141d2e;     /* Lighter navy */
+  --ink-lighter: #1e2a3d;   /* Even lighter navy */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+  --gold: #d4af37;          /* Premium gold */
+  --gold-light: #e5c76b;    /* Light gold */
+  --gold-dark: #b8962e;     /* Dark gold */
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
+  --surface: #ffffff;       /* Pure white */
+  --surface-dim: #f7f8fa;   /* Slightly off-white */
+  --surface-muted: #eef0f4; /* Muted surface */
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --text: #0a0f1c;          /* Primary text */
+  --text-secondary: #4a5568; /* Secondary text */
+  --text-muted: #718096;    /* Muted text */
+
+  --border: #e2e6ec;        /* Subtle border */
+  --border-strong: #cbd2dc; /* Strong border */
+
+  --live: #dc2626;          /* Live red */
+  --positive: #059669;      /* Positive green */
+  --negative: #dc2626;      /* Negative red */
+
+  /* Typography */
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'SF Mono', 'Roboto Mono', monospace;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* No border radius - sharp professional edges */
+  --radius: 0;
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
+}
+
+html, body {
+  max-width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--surface-dim);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
 a {
@@ -35,8 +65,37 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+button {
+  font-family: inherit;
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-dim);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 2px solid var(--surface-dim);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Utility: Tabular Numbers */
+.tnum {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* Selection */
+::selection {
+  background: var(--gold);
+  color: var(--ink);
 }

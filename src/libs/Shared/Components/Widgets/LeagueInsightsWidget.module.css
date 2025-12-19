@@ -1,0 +1,85 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sectionTitle {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--secondary-light);
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.rank {
+  font-size: 0.8rem;
+  color: var(--secondary-light);
+  width: 15px;
+  font-weight: 700;
+}
+
+.name {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.value {
+  font-weight: 800;
+  color: var(--primary); /* Gold for values */
+}
+
+.percent {
+  font-size: 0.75rem;
+  color: var(--secondary-light);
+  margin-left: 0.5rem;
+}
+
+.skeletonTitle {
+  height: 1.5rem;
+  background: var(--surface-light);
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeletonItem {
+  height: 2rem;
+  background: var(--surface-light);
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

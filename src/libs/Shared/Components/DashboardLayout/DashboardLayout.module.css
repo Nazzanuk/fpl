@@ -1,0 +1,124 @@
+.container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem;
+  max-width: 1920px; /* Wider for broadcast feel */
+  margin: 0 auto;
+  background: var(--background);
+  min-height: 100vh;
+}
+
+.mainContent {
+  grid-column: span 12;
+}
+
+@media (min-width: 1024px) {
+  .mainContent {
+    grid-column: span 8;
+  }
+
+  .sidePanel {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+.header {
+  grid-column: span 12;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+
+/* Gold accent line at the top of the header */
+.header::before {
+  content: '';
+  position: absolute;
+  top: -1.5rem; /* Extend to top of container padding */
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.brand {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand::after {
+  content: 'LIVE';
+  font-size: 0.75rem;
+  background: var(--accent);
+  color: white;
+  padding: 0.1rem 0.4rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.navLink {
+  text-decoration: none;
+  color: var(--secondary-light);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.2s;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid transparent;
+}
+
+.navLink:hover {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--secondary);
+  margin: 0;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.subtitle {
+  color: var(--secondary-light);
+  margin-top: 0.5rem;
+  font-weight: 500;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subtitle::before {
+  content: '';
+  display: block;
+  width: 2rem;
+  height: 2px;
+  background: var(--primary);
+}

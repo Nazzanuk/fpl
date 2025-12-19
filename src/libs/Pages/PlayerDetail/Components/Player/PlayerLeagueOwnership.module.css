@@ -1,0 +1,130 @@
+/* ===== LEAGUE OWNERSHIP SECTION ===== */
+.container {
+  background: var(--surface);
+  padding: 1rem 1.25rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.ownershipPercent {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--gold-dark);
+  font-feature-settings: "tnum";
+}
+
+.summary {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--ink);
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.summaryValue {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: white;
+  font-feature-settings: "tnum";
+  line-height: 1;
+}
+
+.summaryLabel {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  margin-top: 0.25rem;
+}
+
+.ownerList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.owner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.625rem;
+  background: var(--surface-muted);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s ease;
+  width: 100%;
+}
+
+.owner:hover {
+  background: var(--surface-dim);
+}
+
+.ownerInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ownerName {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.captainBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 0.5625rem;
+  font-weight: 800;
+}
+
+.viewLink {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gold-dark);
+}
+
+.empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  padding: 1.5rem 0;
+}
+
+.emptyIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.3;
+}

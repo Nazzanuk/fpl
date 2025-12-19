@@ -1,0 +1,147 @@
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  background: var(--surface);
+  border-radius: 0px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  color: var(--foreground);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid var(--primary); /* Gold separator */
+  background: var(--secondary); /* Dark header for contrast */
+  color: white;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 24px;
+  background: var(--primary); /* Gold accent */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHeader {
+  text-align: left;
+  padding: 1rem 2rem;
+  color: var(--secondary-light);
+  background: var(--surface-alt);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.row {
+  background: var(--surface);
+  transition: all 0.1s ease;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: var(--surface-alt);
+  border-left: 4px solid var(--primary); /* Gold indicator on hover */
+}
+
+.cell {
+  padding: 1.25rem 2rem;
+  white-space: nowrap;
+}
+
+.rank {
+  font-weight: 900;
+  color: var(--secondary);
+  width: 4rem;
+  text-align: center;
+  font-feature-settings: "tnum";
+  font-size: 1.25rem;
+  background: var(--surface-alt); /* Distinct background for rank */
+  border-right: 1px solid var(--border);
+}
+
+.managerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.managerName {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.playerName {
+  font-size: 0.85rem;
+  color: var(--secondary-light);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.points {
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: var(--secondary);
+  font-feature-settings: "tnum";
+  text-align: right;
+}
+
+.pointsLive {
+  color: var(--primary); /* Gold for live points */
+}
+
+.link {
+  text-decoration: none;
+  display: block;
+}
+
+.skeleton {
+  width: 100%;
+  height: 400px;
+  background: var(--surface-alt);
+  border-radius: 0px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+.trimean {
+  color: var(--secondary-light);
+  font-size: 1.1rem;
+  font-weight: 700;
+}

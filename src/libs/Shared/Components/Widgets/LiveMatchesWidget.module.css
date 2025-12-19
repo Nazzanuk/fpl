@@ -1,0 +1,81 @@
+.matchList {
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* Remove gap, use borders */
+}
+
+.match {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  background: transparent;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.match:last-child {
+  border-bottom: none;
+}
+
+.team {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.home {
+  text-align: right;
+}
+
+.away {
+  text-align: left;
+}
+
+.score {
+  background: #f1f5f9;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0px;
+  font-weight: 700;
+  margin: 0 0.75rem;
+  min-width: 60px;
+  text-align: center;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+}
+
+.time {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
+.live {
+  color: #e90052; /* FPL Pink/Red */
+  font-weight: bold;
+}
+
+.empty {
+    color: #64748b;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+}
+
+.skeletonMatch {
+  height: 3rem;
+  background: var(--surface-light);
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

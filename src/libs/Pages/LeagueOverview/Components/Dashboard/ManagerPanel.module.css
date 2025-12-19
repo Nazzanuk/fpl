@@ -1,0 +1,94 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--surface-dim);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pitch {
+  margin: 0 1rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.transferCost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.625rem;
+  margin: 0 1rem 1rem;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  font-size: 0.75rem;
+  color: var(--negative);
+  font-weight: 600;
+}
+
+.transferCost::before {
+  content: '−';
+  font-weight: 800;
+}
+
+.skeleton {
+  padding: 1rem;
+}
+
+.skeletonHeader {
+  height: 4.5rem;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonStats {
+  height: 10rem;
+  margin-top: 1rem;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonPitch {
+  height: 18rem;
+  margin-top: 1rem;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--negative);
+  font-size: 0.8125rem;
+}
+
+@keyframes shimmer {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}

@@ -1,0 +1,108 @@
+/* ===== SEASON STATS SECTION ===== */
+.container {
+  background: var(--surface);
+  padding: 1rem 1.25rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  background: var(--surface-muted);
+}
+
+.statValue {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--text);
+  font-feature-settings: "tnum";
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-top: 0.375rem;
+  text-align: center;
+}
+
+.stat[data-highlight="true"] {
+  background: var(--ink);
+}
+
+.stat[data-highlight="true"] .statValue {
+  color: var(--gold);
+}
+
+.stat[data-highlight="true"] .statLabel {
+  color: var(--text-muted);
+}
+
+/* Expected Stats */
+.expectedSection {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.expectedTitle {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.expectedGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.expectedStat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.625rem;
+  background: var(--surface-muted);
+}
+
+.expectedLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.expectedValue {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--text);
+  font-feature-settings: "tnum";
+}

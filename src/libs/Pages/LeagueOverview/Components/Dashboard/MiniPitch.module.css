@@ -1,0 +1,427 @@
+/* ===== HORIZONTAL PITCH LAYOUT ===== */
+.container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Header Bar - Horizontal on top */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background: var(--ink);
+  border-bottom: 3px solid var(--gold);
+}
+
+.headerTitle {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.headerStats {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.headerStat {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--gold);
+  font-feature-settings: "tnum";
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+.statLabel {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Main content - pitch + bench side by side */
+.main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Pitch Area - Horizontal with vertical stripes */
+.pitch {
+  position: relative;
+  flex: 1;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #2d8a4e 0px,
+      #2d8a4e 50px,
+      #34a058 50px,
+      #34a058 100px
+    );
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+}
+
+/* Pitch gradient overlay for depth */
+.pitchOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+}
+
+/* Pitch line markings */
+.pitchLines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.centerLine {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  bottom: 8%;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.penaltyAreaLeft {
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 48px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-left: none;
+}
+
+.penaltyAreaRight {
+  position: absolute;
+  right: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 48px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-right: none;
+}
+
+/* Formation Layout - Horizontal */
+.formation {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.formationCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+/* Player Card - Bigger for horizontal layout */
+.player {
+  position: relative;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.player:hover {
+  transform: translateY(-4px) scale(1.05);
+  z-index: 10;
+  filter: brightness(1.05);
+}
+
+.player:hover .playerCard {
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 2px var(--gold);
+}
+
+.playerCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 72px;
+  background: white;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+/* High scorer - Gold treatment */
+.player[data-high="true"] .playerCard {
+  background: linear-gradient(180deg, #fef3c7 0%, #fffbeb 50%, white 100%);
+  box-shadow:
+    0 4px 12px rgba(212, 175, 55, 0.3),
+    0 0 0 2px var(--gold),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.player[data-high="true"] .playerDetails {
+  background: linear-gradient(180deg, #92400e 0%, var(--ink) 100%);
+}
+
+.player[data-high="true"] .playerPoints {
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
+/* Low scorer */
+.player[data-low="true"] .playerCard {
+  background: linear-gradient(180deg, #fee2e2 0%, #fef2f2 50%, white 100%);
+}
+
+.player[data-low="true"] .playerPoints {
+  color: #ef4444;
+}
+
+/* Did not play */
+.player[data-dnp="true"] {
+  opacity: 0.5;
+}
+
+.player[data-dnp="true"] .playerCard {
+  background: #e5e7eb;
+}
+
+/* Bench player */
+.player[data-bench="true"] .playerCard {
+  width: 56px;
+  background: var(--surface);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.player[data-bench="true"] .shirtContainer {
+  padding: var(--space-1) 0;
+}
+
+.player[data-bench="true"] .shirt {
+  width: 28px;
+  height: 28px;
+}
+
+.player[data-bench="true"] .playerDetails {
+  background: var(--ink-lighter);
+}
+
+.player[data-bench="true"] .playerPoints {
+  font-size: 0.875rem;
+}
+
+.player[data-bench="true"] .playerName {
+  font-size: 0.5rem;
+}
+
+/* Shirt Container */
+.shirtContainer {
+  position: relative;
+  width: 100%;
+  padding: var(--space-2) 0;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(0,0,0,0.03) 0%, transparent 50%);
+}
+
+.shirt {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.15));
+  transition: transform 0.2s ease;
+}
+
+.player:hover .shirt {
+  transform: scale(1.08);
+}
+
+/* Captain Badge */
+.captainBadge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 0.625rem;
+  font-weight: 800;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.vcBadge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 800;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Player Details - The dark info bar */
+.playerDetails {
+  width: 100%;
+  padding: var(--space-1) var(--space-1) var(--space-2);
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.playerName {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.playerPoints {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: white;
+  font-feature-settings: "tnum";
+  line-height: 1.1;
+}
+
+/* Bench Section - Vertical column on right */
+.bench {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  width: 80px;
+}
+
+.benchHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  background: var(--ink-lighter);
+  gap: 0;
+}
+
+.benchTitle {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.benchPoints {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  font-feature-settings: "tnum";
+}
+
+.benchPlayers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: var(--surface-dim);
+  flex: 1;
+}
+
+.benchSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.benchOrder {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: white;
+  background: var(--ink-lighter);
+  font-feature-settings: "tnum";
+}
+
+/* Next Fixture Display */
+.nextFixture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  padding: 2px 0;
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.nextFixture[data-fdr="1"] { background: #22c55e; color: white; }
+.nextFixture[data-fdr="2"] { background: #84cc16; color: var(--ink); }
+.nextFixture[data-fdr="3"] { background: #eab308; color: var(--ink); }
+.nextFixture[data-fdr="4"] { background: #f97316; color: white; }
+.nextFixture[data-fdr="5"] { background: #ef4444; color: white; }
+
+.fixtureOpponent {
+  font-weight: 800;
+}
+
+.fixtureVenue {
+  opacity: 0.8;
+  font-size: 0.4375rem;
+}

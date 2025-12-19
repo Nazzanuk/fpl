@@ -1,0 +1,181 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--surface);
+  height: 100%;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: none;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab[data-active="true"] {
+  background: var(--ink);
+  color: white;
+}
+
+.tab:hover:not([data-active="true"]) {
+  background: var(--surface-dim);
+}
+
+/* Table */
+.tableWrapper {
+  flex: 1;
+  overflow: auto;
+  border: 1px solid var(--border);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  padding: var(--space-2) var(--space-2);
+  text-align: left;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: white;
+  background: var(--ink);
+}
+
+.table td {
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--surface-muted);
+  vertical-align: middle;
+  font-feature-settings: "tnum";
+}
+
+.table tr:hover td {
+  background: var(--surface-dim);
+}
+
+.rankCell {
+  font-weight: 700;
+  color: var(--text);
+  width: 32px;
+}
+
+.playerCell {
+  min-width: 120px;
+}
+
+.playerName {
+  display: block;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.playerMeta {
+  display: block;
+  font-size: 0.5625rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.priceCell {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pointsCell {
+  font-weight: 800;
+  color: var(--text);
+}
+
+.formCell {
+  font-weight: 700;
+}
+
+.formCell[data-form="high"] {
+  color: var(--positive);
+}
+
+.formCell[data-form="medium"] {
+  color: var(--gold-dark);
+}
+
+.formCell[data-form="low"] {
+  color: var(--text-muted);
+}
+
+.ownCell {
+  color: var(--text-secondary);
+}
+
+/* Skeleton States */
+.skeletonTitle {
+  width: 150px;
+  height: 24px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonSubtitle {
+  width: 180px;
+  height: 14px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonTabs {
+  height: 40px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonList {
+  flex: 1;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

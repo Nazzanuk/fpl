@@ -1,0 +1,290 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  background: var(--ink);
+  border-bottom: 3px solid var(--gold);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.deadline {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Gameweek Selector */
+.gwSelector {
+  display: flex;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.gwSelector::-webkit-scrollbar {
+  display: none;
+}
+
+.gwButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 64px;
+}
+
+.gwButton:hover {
+  background: var(--surface-dim);
+  border-color: var(--ink-lighter);
+}
+
+.gwButton[data-active="true"] {
+  background: var(--ink);
+  border-color: var(--gold);
+}
+
+.gwButton[data-active="true"] .gwNumber {
+  color: var(--gold);
+}
+
+.gwButton[data-current="true"] {
+  border-width: 2px;
+}
+
+.gwNumber {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.gwButton[data-active="true"] .gwNumber {
+  color: var(--gold);
+}
+
+.gwStatus {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 1px 4px;
+}
+
+.gwButton[data-active="true"] .gwStatus {
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--gold);
+}
+
+/* Fixtures List */
+.fixturesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.dateGroup {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.dateHeader {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: white;
+  background: var(--ink);
+  padding: var(--space-2) var(--space-4);
+}
+
+.fixture {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.15s ease;
+}
+
+.fixture:last-child {
+  border-bottom: none;
+}
+
+.fixture:hover {
+  background: var(--surface-dim);
+}
+
+.fixture[data-live="true"] {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.05) 0%, transparent 50%);
+  border-left: 3px solid #ef4444;
+}
+
+.fixtureTeams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.team[data-away] {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.teamName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.team[data-winner="true"] .teamName {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.teamShort {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  background: var(--surface-dim);
+  padding: 2px 6px;
+}
+
+.score {
+  flex: 0 0 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.scoreNum {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--ink);
+  font-feature-settings: "tnum";
+  min-width: 24px;
+  text-align: center;
+}
+
+.scoreSep {
+  color: var(--muted);
+}
+
+.liveMinutes {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 2px 4px;
+  margin-left: var(--space-1);
+}
+
+.kickoff {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--surface-dim);
+  padding: var(--space-1) var(--space-2);
+}
+
+/* FDR Indicator */
+.fdrIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+
+.fdrLabel {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.fdrHome,
+.fdrAway {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: white;
+}
+
+.fdrHome[data-fdr="1"], .fdrAway[data-fdr="1"] { background: #22c55e; }
+.fdrHome[data-fdr="2"], .fdrAway[data-fdr="2"] { background: #84cc16; }
+.fdrHome[data-fdr="3"], .fdrAway[data-fdr="3"] { background: #eab308; color: var(--ink); }
+.fdrHome[data-fdr="4"], .fdrAway[data-fdr="4"] { background: #f97316; }
+.fdrHome[data-fdr="5"], .fdrAway[data-fdr="5"] { background: #ef4444; }
+
+.empty {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* Skeleton */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.skeletonHeader {
+  height: 60px;
+  background: var(--surface-dim);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.skeletonList {
+  height: 400px;
+  background: var(--surface-dim);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

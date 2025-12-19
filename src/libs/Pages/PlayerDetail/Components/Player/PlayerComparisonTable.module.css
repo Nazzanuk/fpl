@@ -1,0 +1,175 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-family: var(--font-display);
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: var(--surface-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+.filters {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.filterBtn {
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filterBtn:hover {
+  background: var(--surface-muted);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.filterBtn.active {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead tr {
+  background: var(--ink);
+}
+
+.table th {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  user-select: none;
+  cursor: pointer;
+  border-bottom: 3px solid var(--gold);
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.table th:hover {
+  background: var(--ink-light);
+}
+
+.table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--surface-muted);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.1s;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover td {
+  background: var(--surface-dim);
+}
+
+.rightAlign {
+  text-align: right !important;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+.sortIcon {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--gold);
+  font-size: 0.625rem;
+  opacity: 0.8;
+}
+
+.playerName {
+  font-weight: 700;
+  color: var(--ink);
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+}
+
+.teamName {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.position {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.highlight {
+  font-weight: 700;
+  color: var(--ink);
+  background: rgba(212, 175, 55, 0.08); /* faint gold background */
+}
+
+.skeletonTable {
+  width: 100%;
+}
+
+.skeletonHeader {
+  height: 3rem;
+  background: var(--ink);
+  margin-bottom: 1px;
+}
+
+.skeletonRow {
+  height: 3.5rem;
+  background: var(--surface-light);
+  margin-bottom: 1px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

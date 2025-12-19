@@ -1,66 +1,78 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { navigateToLeague } from '../libs/Fpl/Actions/NavigationActions';
+import styles from './page.module.css';
 
 export default function Home() {
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className={styles.main}>
+      <div className={styles.container}>
+        <header className={styles.header}>
+          <div className={styles.brand}>
+            FPL<span className={styles.brandAccent}>Live</span>
+          </div>
+          <div className={styles.headerBadge}>Season 2024/25</div>
+        </header>
+
+        <div className={styles.hero}>
+          <h1 className={styles.title}>
+            Track your mini-league
+            <span className={styles.highlight}>in real time</span>
+          </h1>
+          <p className={styles.subtitle}>
+            Live scores, projected bonus points, auto-subs, and captain performance.
+            See exactly who&apos;s winning your league right now.
           </p>
+
+          <form action={navigateToLeague} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <input
+                type="number"
+                name="leagueId"
+                placeholder="Enter your league ID"
+                className={styles.input}
+                required
+              />
+              <button type="submit" className={styles.button}>
+                Track
+              </button>
+            </div>
+            <p className={styles.hint}>
+              Find your league ID in the URL when viewing your league on the FPL website
+            </p>
+          </form>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className={styles.features}>
+          <div className={styles.feature}>
+            <div className={styles.featureIcon}>01</div>
+            <h3 className={styles.featureTitle}>Live Standings</h3>
+            <p className={styles.featureDesc}>
+              Real-time league table with live gameweek scores and position changes
+            </p>
+          </div>
+          <div className={styles.feature}>
+            <div className={styles.featureIcon}>02</div>
+            <h3 className={styles.featureTitle}>Head to Head</h3>
+            <p className={styles.featureDesc}>
+              Compare any two managers side by side with detailed breakdowns
+            </p>
+          </div>
+          <div className={styles.feature}>
+            <div className={styles.featureIcon}>03</div>
+            <h3 className={styles.featureTitle}>Differentials</h3>
+            <p className={styles.featureDesc}>
+              Discover which players give you an edge over your rivals
+            </p>
+          </div>
+          <div className={styles.feature}>
+            <div className={styles.featureIcon}>04</div>
+            <h3 className={styles.featureTitle}>Ownership</h3>
+            <p className={styles.featureDesc}>
+              See exactly who owns what across your entire league
+            </p>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
