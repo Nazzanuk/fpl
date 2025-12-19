@@ -1,0 +1,96 @@
+.hoverCard {
+  position: absolute;
+  z-index: 1000;
+  background: var(--ink);
+  color: white;
+  padding: 1rem;
+  width: 200px;
+  pointer-events: none;
+  border-left: 3px solid var(--gold);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: fadeIn 0.1s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.playerName {
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.teamName {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  margin-top: -0.5rem;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statLabel {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.statValue {
+  font-size: 0.75rem;
+  font-weight: 800;
+  font-feature-settings: "tnum";
+}
+
+.fixture {
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fixtureOpponent {
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.fixtureDifficulty {
+  width: 12px;
+  height: 12px;
+}
+
+.fixtureDifficulty[data-fdr="1"] { background: #00ff85; }
+.fixtureDifficulty[data-fdr="2"] { background: #00ff85; }
+.fixtureDifficulty[data-fdr="3"] { background: #ebebe0; }
+.fixtureDifficulty[data-fdr="4"] { background: #ff005a; }
+.fixtureDifficulty[data-fdr="5"] { background: #ff005a; }
+
+.clickHint {
+  margin-top: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}

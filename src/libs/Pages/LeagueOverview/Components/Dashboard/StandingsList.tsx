@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { LiveManagerScore } from '../../../../Fpl/Types';
 import styles from './StandingsList.module.css';
 
@@ -10,8 +11,32 @@ type Props = {
 };
 
 export const StandingsList = ({ scores, selectedId, onSelect }: Props) => {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedId) return;
+      
+      const currentIndex = scores.findIndex(s => s.managerId === selectedId);
+      if (currentIndex === -1) return;
+
+      if (e.key === 'ArrowDown') {
+        const nextIndex = Math.min(currentIndex + 1, scores.length - 1);
+        onSelect(scores[nextIndex].managerId);
+        e.preventDefault();
+      } else if (e.key === 'ArrowUp') {
+        const prevIndex = Math.max(currentIndex - 1, 0);
+        onSelect(scores[prevIndex].managerId);
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedId, scores, onSelect]);
+
   return (
-    <div className={styles.list}>
+    <div className={styles.list} ref={listRef}>
       <div className={styles.tableHeader}>
         <div className={styles.tableHeaderCell}>Pos</div>
         <div className={styles.tableHeaderCell}>Team</div>
@@ -26,6 +51,7 @@ export const StandingsList = ({ scores, selectedId, onSelect }: Props) => {
         return (
           <button
             key={score.managerId}
+            type="button"
             className={`${styles.row} ${isSelected ? styles.selected : ''}`}
             onClick={() => onSelect(score.managerId)}
           >
@@ -33,7 +59,12 @@ export const StandingsList = ({ scores, selectedId, onSelect }: Props) => {
               <span className={styles.rankNum}>{rank}</span>
               {rankChange !== 0 && (
                 <span className={`${styles.movement} ${rankChange > 0 ? styles.up : styles.down}`}>
-                  {rankChange > 0 ? '▲' : '▼'}
+                  <span 
+                    className="material-symbols-sharp" 
+                    style={{ fontSize: '12px' }}
+                  >
+                    {rankChange > 0 ? 'stat_1' : 'stat_minus_1'}
+                  </span>
                 </span>
               )}
             </div>

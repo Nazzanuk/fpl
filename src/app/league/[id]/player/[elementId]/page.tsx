@@ -6,17 +6,23 @@ type PageProps = {
   params: Promise<{ id: string; elementId: string }>;
 };
 
-export default async function PlayerPage({ params }: PageProps) {
+async function PlayerPageContent({ params }: PageProps) {
   const { id, elementId } = await params;
   const leagueId = parseInt(id, 10);
   const playerElementId = parseInt(elementId, 10);
 
   return (
+    <PlayerDetailAsync
+      elementId={playerElementId}
+      leagueId={leagueId}
+    />
+  );
+}
+
+export default function PlayerPage({ params }: PageProps) {
+  return (
     <Suspense fallback={<PlayerDetailSkeleton />}>
-      <PlayerDetailAsync
-        elementId={playerElementId}
-        leagueId={leagueId}
-      />
+      <PlayerPageContent params={params} />
     </Suspense>
   );
 }

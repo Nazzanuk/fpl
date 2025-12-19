@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { getBootstrapStatic, getLeagueManagers } from '../../../../Fpl/Data/Client/FPLApiClient';
+import type { BootstrapStatic, LeagueStandings } from '../../../../Fpl/Types';
 import styles from './Dashboard.module.css';
 
 type Props = {
@@ -16,9 +17,6 @@ export const DashboardHeader = (props: Props) => {
 
 const DashboardHeaderSkeleton = () => (
   <header className={styles.header}>
-    <div className={styles.brand}>
-      FPL<span className={styles.brandAccent}>Live</span>
-    </div>
     <div className={styles.leagueInfo}>
       <h1 className={styles.leagueName}>Loading...</h1>
       <div className={styles.gwBadge}>Gameweek --</div>
@@ -32,18 +30,15 @@ const DashboardHeaderSkeleton = () => (
 
 const DashboardHeaderInner = async ({ leagueId }: Props) => {
   const [bootstrap, leagueData] = await Promise.all([
-    getBootstrapStatic(),
-    getLeagueManagers(leagueId),
+    getBootstrapStatic() as Promise<BootstrapStatic>,
+    getLeagueManagers(leagueId) as Promise<LeagueStandings>,
   ]);
 
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current);
+  const currentEvent = bootstrap.events.find(e => e.is_current);
   const currentGw = currentEvent?.id || 38;
 
   return (
     <header className={styles.header}>
-      <div className={styles.brand}>
-        FPL<span className={styles.brandAccent}>Live</span>
-      </div>
       <div className={styles.leagueInfo}>
         <h1 className={styles.leagueName}>{leagueData.league.name}</h1>
         <div className={styles.gwBadge}>Gameweek {currentGw}</div>

@@ -3,13 +3,13 @@ import { buildLiveTable } from '../../../../Fpl/Services/FPLEngine';
 import { StandingsListServer } from './StandingsListServer';
 import styles from './StandingsList.module.css';
 
-type StandingsAsyncProps = {
-  leagueId: number;
-  selectedManagerId?: number;
-  view: string;
+type PageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ manager?: string; view?: string }>;
+  viewOverride?: string;
 };
 
-export const StandingsAsync = (props: StandingsAsyncProps) => {
+export const StandingsAsync = (props: PageProps) => {
   return (
     <Suspense fallback={<StandingsAsyncSkeleton />}>
       <StandingsAsyncInner {...props} />
@@ -36,7 +36,13 @@ const StandingsAsyncSkeleton = () => (
   </div>
 );
 
-const StandingsAsyncInner = async ({ leagueId, selectedManagerId, view }: StandingsAsyncProps) => {
+const StandingsAsyncInner = async ({ params, searchParams, viewOverride }: PageProps) => {
+  const { id } = await params;
+  const { manager, view } = await searchParams;
+  
+  const leagueId = parseInt(id, 10);
+  const selectedManagerId = manager ? parseInt(manager, 10) : undefined;
+  
   const scores = await buildLiveTable(leagueId);
 
   return (
@@ -44,7 +50,7 @@ const StandingsAsyncInner = async ({ leagueId, selectedManagerId, view }: Standi
       leagueId={leagueId}
       scores={scores}
       selectedManagerId={selectedManagerId}
-      view={view}
+      view={viewOverride || view || 'standings'}
     />
   );
 };

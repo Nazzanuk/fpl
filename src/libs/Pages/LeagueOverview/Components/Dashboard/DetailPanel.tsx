@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ManagerPanel } from './ManagerPanel';
 import { DifferentialsView } from './DifferentialsView';
 import { OwnershipView } from './OwnershipView';
@@ -9,6 +10,8 @@ import { TransferPlannerAsync } from '../../../Tools/Components/TransferPlanner/
 import { ChipAdvisorAsync } from '../../../Tools/Components/ChipAdvisor/ChipAdvisorAsync';
 import { TopPerformersAsync } from '../../../Tools/Components/TopPerformers/TopPerformersAsync';
 import { FixturesAsync } from '../../../Tools/Components/Fixtures/FixturesAsync';
+import { LeagueSummaryAsync } from './LeagueSummaryAsync';
+import { DetailPanelSkeleton } from './Skeletons/DetailPanelSkeleton';
 import styles from './Dashboard.module.css';
 
 type Props = {
@@ -17,45 +20,83 @@ type Props = {
   view: string;
 };
 
+const WrapSuspense = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<DetailPanelSkeleton />}>{children}</Suspense>
+);
+
 export const DetailPanel = ({ leagueId, managerId, view }: Props) => {
+  const defaultEmpty = (
+    <Suspense fallback={<div className={styles.emptyDetail}>Loading overview...</div>}>
+      <LeagueSummaryAsync leagueId={leagueId} />
+    </Suspense>
+  );
+
   switch (view) {
     case 'differentials':
       return managerId ? (
         <DifferentialsView leagueId={leagueId} managerId={managerId} />
       ) : (
-        <div className={styles.emptyDetail}>Select a manager to see differentials</div>
+        defaultEmpty
       );
     case 'ownership':
       return <OwnershipView leagueId={leagueId} />;
     case 'h2h':
-      return <HeadToHeadAsync leagueId={leagueId} />;
+      return (
+        <WrapSuspense>
+          <HeadToHeadAsync leagueId={leagueId} />
+        </WrapSuspense>
+      );
     case 'history':
       return managerId ? (
-        <ManagerHistoryAsync leagueId={leagueId} managerId={managerId} />
+        <WrapSuspense>
+          <ManagerHistoryAsync leagueId={leagueId} managerId={managerId} />
+        </WrapSuspense>
       ) : (
-        <div className={styles.emptyDetail}>Select a manager to see history</div>
+        defaultEmpty
       );
     case 'trends':
-      return <LeagueTrendsAsync leagueId={leagueId} />;
+      return (
+        <WrapSuspense>
+          <LeagueTrendsAsync leagueId={leagueId} />
+        </WrapSuspense>
+      );
     case 'fdr':
-      return <FDRPlannerAsync />;
+      return (
+        <WrapSuspense>
+          <FDRPlannerAsync />
+        </WrapSuspense>
+      );
     case 'transfers':
-      return <TransferPlannerAsync />;
+      return (
+        <WrapSuspense>
+          <TransferPlannerAsync />
+        </WrapSuspense>
+      );
     case 'chips':
       return managerId ? (
-        <ChipAdvisorAsync managerId={managerId} />
+        <WrapSuspense>
+          <ChipAdvisorAsync managerId={managerId} />
+        </WrapSuspense>
       ) : (
-        <div className={styles.emptyDetail}>Select a manager to see chip advice</div>
+        defaultEmpty
       );
     case 'top':
-      return <TopPerformersAsync />;
+      return (
+        <WrapSuspense>
+          <TopPerformersAsync />
+        </WrapSuspense>
+      );
     case 'fixtures':
-      return <FixturesAsync />;
+      return (
+        <WrapSuspense>
+          <FixturesAsync />
+        </WrapSuspense>
+      );
     default:
       return managerId ? (
         <ManagerPanel leagueId={leagueId} managerId={managerId} rank={0} currentGw={0} />
       ) : (
-        <div className={styles.emptyDetail}>Select a manager</div>
+        defaultEmpty
       );
   }
 };

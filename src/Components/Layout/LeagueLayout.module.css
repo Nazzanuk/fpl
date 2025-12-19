@@ -1,0 +1,82 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--surface-dim);
+}
+
+.header {
+  background: var(--ink);
+  color: white;
+  border-bottom: 3px solid var(--gold);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand {
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: white;
+}
+
+.brand span {
+  color: var(--gold);
+}
+
+.liveIndicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--live);
+    background: rgba(220, 38, 38, 0.1); /* transparent red */
+    padding: 0.25rem 0.5rem;
+    /* no border radius */
+}
+
+.liveDot {
+    width: 6px;
+    height: 6px;
+    background: var(--live);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 1.5rem;
+}
+
+.tickerContainer {
+    overflow: hidden;
+    background: var(--ink-light);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    height: 40px;
+    display: flex;
+    align-items: center;
+}

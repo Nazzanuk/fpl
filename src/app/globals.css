@@ -1,40 +1,63 @@
 :root {
-  /* Premium Sports Broadcast Color Palette */
-  --ink: #0a0f1c;           /* Deep navy - primary dark */
-  --ink-light: #141d2e;     /* Lighter navy */
-  --ink-lighter: #1e2a3d;   /* Even lighter navy */
+  /* Premium Sports Broadcast Color Palette - DESIGN.md */
+  
+  /* Deep Navy - Primary dark color */
+  --ink: #0a0f1c;           /* Headers, badges, emphasis */
+  --ink-light: #141d2e;     /* Secondary dark surfaces */
+  --ink-lighter: #1e2a3d;   /* Tertiary dark, borders on dark */
 
-  --gold: #d4af37;          /* Premium gold */
-  --gold-light: #e5c76b;    /* Light gold */
-  --gold-dark: #b8962e;     /* Dark gold */
+  /* Premium Gold - Accent color */
+  --gold: #d4af37;          /* Primary accent, highlights */
+  --gold-light: #e5c76b;    /* Hover states, secondary accent */
+  --gold-dark: #b8962e;     /* Text on light backgrounds */
 
-  --surface: #ffffff;       /* Pure white */
-  --surface-dim: #f7f8fa;   /* Slightly off-white */
-  --surface-muted: #eef0f4; /* Muted surface */
+  /* Surface Colors */
+  --surface: #ffffff;       /* Primary content background */
+  --surface-dim: #f7f8fa;   /* Page background, recessed areas */
+  --surface-muted: #eef0f4; /* Subtle differentiation, hover states */
 
-  --text: #0a0f1c;          /* Primary text */
-  --text-secondary: #4a5568; /* Secondary text */
-  --text-muted: #718096;    /* Muted text */
+  /* Text Colors */
+  --text: #0a0f1c;          /* Primary text (matches --ink) */
+  --text-secondary: #4a5568; /* Secondary information */
+  --text-muted: #718096;    /* Tertiary, labels, hints */
 
-  --border: #e2e6ec;        /* Subtle border */
+  /* Semantic Colors */
+  --border: #e2e6ec;        /* Default borders */
   --border-strong: #cbd2dc; /* Strong border */
-
-  --live: #dc2626;          /* Live red */
-  --positive: #059669;      /* Positive green */
-  --negative: #dc2626;      /* Negative red */
+  --live: #dc2626;          /* Live indicators, urgent */
+  --positive: #059669;      /* Gains, improvements, green arrows */
+  --negative: #dc2626;      /* Losses, drops, red indicators */
 
   /* Typography */
-  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'SF Mono', 'Roboto Mono', monospace;
+  --font-display: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', 'Roboto Mono', 'Menlo', monospace;
+
+  /* Font sizes */
+  --text-4xl: 3.25rem;    /* 52px */
+  --text-3xl: 2.5rem;     /* 40px */
+  --text-2xl: 2rem;       /* 32px */
+  --text-xl: 1.75rem;     /* 28px */
+  --text-lg: 1.375rem;    /* 22px */
+  --text-base: 1.125rem;  /* 18px */
+  --text-md: 1rem;        /* 16px */
+  --text-sm: 0.9375rem;   /* 15px */
+  --text-xs: 0.875rem;    /* 14px */
+  --text-2xs: 0.8125rem;  /* 13px */
+  --text-3xs: 0.75rem;    /* 12px */
 
   /* Spacing */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
+  --space-0: 0;
+  --space-px: 1px;
+  --space-1: 0.25rem;      /* 4px */
+  --space-2: 0.5rem;       /* 8px */
+  --space-3: 0.75rem;      /* 12px */
+  --space-4: 1rem;         /* 16px */
+  --space-5: 1.25rem;      /* 20px */
+  --space-6: 1.5rem;       /* 24px */
+  --space-8: 2rem;         /* 32px */
+  --space-10: 2.5rem;      /* 40px */
+  --space-12: 3rem;        /* 48px */
+  --space-16: 4rem;        /* 64px */
 
   /* No border radius - sharp professional edges */
   --radius: 0;
@@ -53,7 +76,7 @@ html, body {
   background: var(--surface-dim);
   color: var(--text);
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: 16px; /* Reset base size */
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -71,8 +94,8 @@ button {
 
 /* Premium Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -80,12 +103,13 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border: 2px solid var(--surface-dim);
+  background: var(--ink-lighter);
+  border: none;
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--gold);
 }
 
 /* Utility: Tabular Numbers */
@@ -99,3 +123,9 @@ button {
   background: var(--gold);
   color: var(--ink);
 }
+
+/* Utilities */
+.text-gold { color: var(--gold); }
+.bg-ink { background-color: var(--ink); }
+.uppercase { text-transform: uppercase; }
+.tracking-wider { letter-spacing: 0.08em; }

@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { PlayerHoverCard } from '../../../../Shared/Components/PlayerHoverCard/PlayerHoverCard';
 import styles from './MiniPitch.module.css';
 
 type Pick = {
@@ -26,6 +28,9 @@ type Props = {
 
 export const MiniPitch = ({ picks, leagueId }: Props) => {
   const router = useRouter();
+  const [hoveredPlayerId, setHoveredPlayerId] = useState<number | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
   const starters = picks.filter(p => p.position <= 11);
   const bench = picks.filter(p => p.position > 11).sort((a, b) => a.position - b.position);
 
@@ -38,6 +43,10 @@ export const MiniPitch = ({ picks, leagueId }: Props) => {
     if (leagueId) {
       router.push(`/league/${leagueId}/player/${elementId}`);
     }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
   };
 
   // Calculate total with auto-subs
@@ -61,55 +70,84 @@ export const MiniPitch = ({ picks, leagueId }: Props) => {
 
   const benchPoints = bench.reduce((sum, p) => sum + p.points, 0);
 
+  const hoveredPlayer = picks.find(p => p.element === hoveredPlayerId);
+
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onMouseMove={handleMouseMove}>
       {/* Header */}
       <div className={styles.header}>
-        <span className={styles.headerTitle}>Squad View</span>
+        <div className={styles.headerTitleContainer}>
+          <span className="material-symbols-sharp" style={{ fontSize: '18px', color: 'var(--gold)' }}>
+            stadium
+          </span>
+          <span className={styles.headerTitle}>Squad View</span>
+        </div>
         <div className={styles.headerStats}>
-          <span className={styles.headerStat}>
+          <div className={styles.headerStat}>
             <span className={styles.statValue}>{totalPoints}</span>
             <span className={styles.statLabel}>pts</span>
-          </span>
+          </div>
         </div>
       </div>
 
       {/* Main content area */}
       <div className={styles.main}>
-        {/* Horizontal Pitch - GK on left, FWD on right */}
+        {/* Vertical Pitch - GK at top, FWD at bottom */}
         <div className={styles.pitch}>
           <div className={styles.pitchOverlay} />
+          
           <div className={styles.pitchLines}>
-            <div className={styles.centerLine} />
-            <div className={styles.penaltyAreaLeft} />
-            <div className={styles.penaltyAreaRight} />
+            <div className={styles.halfwayLine} />
+            <div className={styles.centerCircle} />
+            <div className={styles.penaltyAreaTop} />
+            <div className={styles.penaltyAreaBottom} />
           </div>
 
           <div className={styles.formation}>
-            <div className={styles.formationCol} data-position="gkp">
+            <div className={styles.pitchRow} data-position="gkp">
               {gkp.map(p => (
-                <PlayerCard key={p.element} player={p} onPlayerClick={handlePlayerClick} />
+                <PlayerCard 
+                  key={p.element} 
+                  player={p} 
+                  onPlayerClick={handlePlayerClick}
+                  onHover={setHoveredPlayerId}
+                />
               ))}
             </div>
-            <div className={styles.formationCol} data-position="def">
+            <div className={styles.pitchRow} data-position="def">
               {def.map(p => (
-                <PlayerCard key={p.element} player={p} onPlayerClick={handlePlayerClick} />
+                <PlayerCard 
+                  key={p.element} 
+                  player={p} 
+                  onPlayerClick={handlePlayerClick}
+                  onHover={setHoveredPlayerId}
+                />
               ))}
             </div>
-            <div className={styles.formationCol} data-position="mid">
+            <div className={styles.pitchRow} data-position="mid">
               {mid.map(p => (
-                <PlayerCard key={p.element} player={p} onPlayerClick={handlePlayerClick} />
+                <PlayerCard 
+                  key={p.element} 
+                  player={p} 
+                  onPlayerClick={handlePlayerClick}
+                  onHover={setHoveredPlayerId}
+                />
               ))}
             </div>
-            <div className={styles.formationCol} data-position="fwd">
+            <div className={styles.pitchRow} data-position="fwd">
               {fwd.map(p => (
-                <PlayerCard key={p.element} player={p} onPlayerClick={handlePlayerClick} />
+                <PlayerCard 
+                  key={p.element} 
+                  player={p} 
+                  onPlayerClick={handlePlayerClick}
+                  onHover={setHoveredPlayerId}
+                />
               ))}
             </div>
           </div>
         </div>
 
-        {/* Bench - vertical on the right */}
+        {/* Bench - remains sidebar style */}
         <div className={styles.bench}>
           <div className={styles.benchHeader}>
             <span className={styles.benchTitle}>Subs</span>
@@ -119,12 +157,28 @@ export const MiniPitch = ({ picks, leagueId }: Props) => {
             {bench.map((p, idx) => (
               <div key={p.element} className={styles.benchSlot}>
                 <span className={styles.benchOrder}>{idx + 1}</span>
-                <PlayerCard player={p} isBench onPlayerClick={handlePlayerClick} />
+                <PlayerCard 
+                  player={p} 
+                  isBench 
+                  onPlayerClick={handlePlayerClick}
+                  onHover={setHoveredPlayerId}
+                />
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {hoveredPlayer && (
+        <PlayerHoverCard
+          playerName={hoveredPlayer.name}
+          teamName={hoveredPlayer.teamName}
+          points={hoveredPlayer.points * hoveredPlayer.multiplier}
+          minutes={hoveredPlayer.minutes}
+          nextFixture={hoveredPlayer.nextFixture}
+          position={mousePos}
+        />
+      )}
     </div>
   );
 };
@@ -133,24 +187,27 @@ type PlayerCardProps = {
   player: Pick;
   isBench?: boolean;
   onPlayerClick: (elementId: number) => void;
+  onHover: (id: number | null) => void;
 };
 
-const PlayerCard = ({ player, isBench = false, onPlayerClick }: PlayerCardProps) => {
+const PlayerCard = ({ player, isBench = false, onPlayerClick, onHover }: PlayerCardProps) => {
   const shirtUrl = `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${player.teamCode}-110.png`;
   const didNotPlay = player.minutes === 0;
   const displayPoints = player.points * player.multiplier;
   const isHighScorer = displayPoints >= 10;
-  const isLowScorer = displayPoints <= 1 && !didNotPlay;
-  const fixture = player.nextFixture;
+  // const isLowScorer = displayPoints <= 1 && !didNotPlay;
+  // const fixture = player.nextFixture;
 
   return (
     <button
+      type="button"
       className={styles.player}
       data-bench={isBench}
       data-dnp={didNotPlay}
       data-high={isHighScorer}
-      data-low={isLowScorer}
       onClick={() => onPlayerClick(player.element)}
+      onMouseEnter={() => onHover(player.element)}
+      onMouseLeave={() => onHover(null)}
     >
       <div className={styles.playerCard}>
         <div className={styles.shirtContainer}>
@@ -175,12 +232,6 @@ const PlayerCard = ({ player, isBench = false, onPlayerClick }: PlayerCardProps)
             {didNotPlay ? '-' : displayPoints}
           </span>
         </div>
-        {fixture && !isBench && (
-          <div className={styles.nextFixture} data-fdr={fixture.difficulty}>
-            <span className={styles.fixtureOpponent}>{fixture.opponent}</span>
-            <span className={styles.fixtureVenue}>{fixture.isHome ? 'H' : 'A'}</span>
-          </div>
-        )}
       </div>
     </button>
   );
