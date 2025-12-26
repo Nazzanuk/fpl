@@ -1,10 +1,8 @@
-import { Suspense } from 'react';
 import { SidebarAsync } from './SidebarAsync';
-import { DashboardHeaderAsync } from './DashboardHeaderAsync';
+import { DashboardHeader } from './DashboardHeader';
 import { MatchTickerAsync } from './MatchTickerAsync';
 import { StandingsAsync } from './StandingsAsync';
 import { DetailPanelAsync } from './DetailPanelAsync';
-import { MatchTickerSkeleton } from './Skeletons/MatchTickerSkeleton';
 
 import styles from './Dashboard.module.css';
 
@@ -16,18 +14,12 @@ type PageProps = {
 export const DashboardPage = (props: PageProps) => {
   return (
     <div className={styles.appContainer}>
-      <Suspense fallback={<div className={styles.sidebarSkeleton} />}>
         <SidebarAsync {...props} />
-      </Suspense>
       
       <div className={styles.container}>
-        <Suspense fallback={<div className={styles.headerSkeleton} />}>
-          <DashboardHeaderAsync {...props} />
-        </Suspense>
+          <DashboardHeader params={props.params} />
         
-        <Suspense fallback={<MatchTickerSkeleton />}>
-          <MatchTickerAsync />
-        </Suspense>
+        <MatchTickerAsync />
         
         <div className={styles.main}>
           <section className={styles.standings}>

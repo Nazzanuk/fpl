@@ -6,25 +6,25 @@ type PageProps = {
   params: Promise<{ id: string; elementId: string }>;
 };
 
-
-
-async function ModalContent({ params }: PageProps) {
-  const { id, elementId } = await params;
-  const leagueId = parseInt(id, 10);
-  const playerElementId = parseInt(elementId, 10);
-
-  return (
-    <PlayerDetailAsync
-      elementId={playerElementId}
-      leagueId={leagueId}
-    />
-  );
-}
-
+/**
+ * Modal route for player detail.
+ * Page is synchronous - param extraction is inside Suspense boundary.
+ */
 export default function PlayerModalPage({ params }: PageProps) {
   return (
     <Suspense fallback={<PlayerDetailSkeleton />}>
-      <ModalContent params={params} />
+      <PlayerModalInner params={params} />
     </Suspense>
   );
 }
+
+const PlayerModalInner = async ({ params }: PageProps) => {
+  const { id, elementId } = await params;
+  
+  return (
+    <PlayerDetailAsync
+      elementId={parseInt(elementId, 10)}
+      leagueId={parseInt(id, 10)}
+    />
+  );
+};

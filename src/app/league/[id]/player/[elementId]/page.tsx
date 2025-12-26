@@ -6,23 +6,27 @@ type PageProps = {
   params: Promise<{ id: string; elementId: string }>;
 };
 
-async function PlayerPageContent({ params }: PageProps) {
-  const { id, elementId } = await params;
-  const leagueId = parseInt(id, 10);
-  const playerElementId = parseInt(elementId, 10);
-
-  return (
-    <PlayerDetailAsync
-      elementId={playerElementId}
-      leagueId={leagueId}
-    />
-  );
-}
-
+/**
+ * Full-page route for player detail.
+ * The page is SYNCHRONOUS - param extraction happens inside Suspense
+ * to avoid blocking the page shell. PlayerDetailAsync manages its own
+ * internal Suspense for data fetching once it has the params.
+ */
 export default function PlayerPage({ params }: PageProps) {
   return (
     <Suspense fallback={<PlayerDetailSkeleton />}>
-      <PlayerPageContent params={params} />
+      <PlayerPageInner params={params} />
     </Suspense>
   );
 }
+
+const PlayerPageInner = async ({ params }: PageProps) => {
+  const { id, elementId } = await params;
+  
+  return (
+    <PlayerDetailAsync
+      elementId={parseInt(elementId, 10)}
+      leagueId={parseInt(id, 10)}
+    />
+  );
+};

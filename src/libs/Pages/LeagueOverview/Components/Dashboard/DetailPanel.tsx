@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { ManagerPanel } from './ManagerPanel';
 import { DifferentialsView } from './DifferentialsView';
 import { OwnershipView } from './OwnershipView';
@@ -11,8 +10,6 @@ import { ChipAdvisorAsync } from '../../../Tools/Components/ChipAdvisor/ChipAdvi
 import { TopPerformersAsync } from '../../../Tools/Components/TopPerformers/TopPerformersAsync';
 import { FixturesAsync } from '../../../Tools/Components/Fixtures/FixturesAsync';
 import { LeagueSummaryAsync } from './LeagueSummaryAsync';
-import { DetailPanelSkeleton } from './Skeletons/DetailPanelSkeleton';
-import styles from './Dashboard.module.css';
 
 type Props = {
   leagueId: number;
@@ -20,16 +17,8 @@ type Props = {
   view: string;
 };
 
-const WrapSuspense = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={<DetailPanelSkeleton />}>{children}</Suspense>
-);
-
 export const DetailPanel = ({ leagueId, managerId, view }: Props) => {
-  const defaultEmpty = (
-    <Suspense fallback={<div className={styles.emptyDetail}>Loading overview...</div>}>
-      <LeagueSummaryAsync leagueId={leagueId} />
-    </Suspense>
-  );
+  const defaultEmpty = <LeagueSummaryAsync leagueId={leagueId} />;
 
   switch (view) {
     case 'differentials':
@@ -41,57 +30,29 @@ export const DetailPanel = ({ leagueId, managerId, view }: Props) => {
     case 'ownership':
       return <OwnershipView leagueId={leagueId} />;
     case 'h2h':
-      return (
-        <WrapSuspense>
-          <HeadToHeadAsync leagueId={leagueId} />
-        </WrapSuspense>
-      );
+      return <HeadToHeadAsync leagueId={leagueId} />;
     case 'history':
       return managerId ? (
-        <WrapSuspense>
-          <ManagerHistoryAsync leagueId={leagueId} managerId={managerId} />
-        </WrapSuspense>
+        <ManagerHistoryAsync leagueId={leagueId} managerId={managerId} />
       ) : (
         defaultEmpty
       );
     case 'trends':
-      return (
-        <WrapSuspense>
-          <LeagueTrendsAsync leagueId={leagueId} />
-        </WrapSuspense>
-      );
+      return <LeagueTrendsAsync leagueId={leagueId} />;
     case 'fdr':
-      return (
-        <WrapSuspense>
-          <FDRPlannerAsync />
-        </WrapSuspense>
-      );
+      return <FDRPlannerAsync />;
     case 'transfers':
-      return (
-        <WrapSuspense>
-          <TransferPlannerAsync />
-        </WrapSuspense>
-      );
+      return <TransferPlannerAsync />;
     case 'chips':
       return managerId ? (
-        <WrapSuspense>
-          <ChipAdvisorAsync managerId={managerId} />
-        </WrapSuspense>
+        <ChipAdvisorAsync managerId={managerId} />
       ) : (
         defaultEmpty
       );
     case 'top':
-      return (
-        <WrapSuspense>
-          <TopPerformersAsync />
-        </WrapSuspense>
-      );
+      return <TopPerformersAsync />;
     case 'fixtures':
-      return (
-        <WrapSuspense>
-          <FixturesAsync />
-        </WrapSuspense>
-      );
+      return <FixturesAsync />;
     default:
       return managerId ? (
         <ManagerPanel leagueId={leagueId} managerId={managerId} rank={0} currentGw={0} />
