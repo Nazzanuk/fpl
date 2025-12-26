@@ -23,7 +23,7 @@ export const PlayerHistory = ({ history }: Props) => {
             <span className={styles.headerCell}>A</span>
             <span className={styles.headerCell}>Pts</span>
           </div>
-          {history.slice(0, 5).map(h => (
+          {[...history].reverse().slice(0, 5).map(h => (
             <div key={h.gameweek} className={styles.historyRow}>
               <span className={`${styles.cell} ${styles.gameweek}`}>{h.gameweek}</span>
               <div className={`${styles.cell} ${styles.opponent}`}>
