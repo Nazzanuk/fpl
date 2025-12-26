@@ -4,17 +4,15 @@
   max-width: 800px;
   margin: 0 auto;
   /* Vector-style pitch */
-  background-color: #10b981;
-  background-image: 
-    linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px);
-  background-size: 50px 50px;
+  background: 
+    linear-gradient(rgba(10, 15, 28, 0.2), rgba(10, 15, 28, 0.2)),
+    linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px),
+    #1a3a1a;
+  background-size: 100% 100%, 50px 50px, 50px 50px, 100% 100%;
   border-radius: 0px; /* Sharp */
   padding: 3rem 2rem;
-  box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  border: 8px solid #ffffff;
+  border: 4px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
@@ -59,7 +57,7 @@
   display: flex;
   justify-content: center;
   gap: 1.5rem;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(10, 15, 28, 0.03);
   border-radius: 0px; /* Sharp */
   padding: 1.5rem;
 }
@@ -93,56 +91,56 @@
 }
 
 .info {
-  background: #ffffff;
+  background: var(--surface);
   border-radius: 0px; /* Sharp */
   width: 100%;
   text-align: center;
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
 }
 
 .name {
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--surface-dim);
+  color: var(--text);
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.25rem 0.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .points {
-  background: #ffffff;
-  color: #0f172a;
+  background: var(--surface);
+  color: var(--text);
   font-size: 1rem;
   font-weight: 800;
   padding: 0.25rem;
 }
 
 .pointsLive {
-  color: #10b981; /* Emerald */
+  color: var(--positive);
 }
 
 .captainBadge {
   position: absolute;
   top: -5px;
   right: -5px;
-  background: #0f172a;
-  color: #ffffff;
+  background: var(--ink);
+  color: white;
   width: 22px;
   height: 22px;
-  border-radius: 50%;
+  border-radius: 0; /* Sharp corners */
   font-size: 0.75rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--gold);
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }

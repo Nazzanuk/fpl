@@ -5,7 +5,7 @@ See AGENTS.md for more information on the project structure and patterns.
 
 ## Project Overview
 
-FPL Live is a Next.js 16 application for real-time Fantasy Premier League mini-league tracking. It consumes the unofficial FPL API to display live scores during gameweeks, including bonus points and auto-substitutions.
+FPL Alchemy is a Next.js 16 application for real-time Fantasy Premier League mini-league tracking. It consumes the unofficial FPL API to display live scores during gameweeks, including bonus points and auto-substitutions.
 
 ## Commands
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import type { PlayerStatSummary } from '../../../../Fpl/Types';
 import styles from './PlayerComparisonTable.module.css';
 
@@ -9,13 +10,28 @@ type SortDirection = 'asc' | 'desc';
 
 type Props = {
   players: PlayerStatSummary[];
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
 };
 
-export const PlayerComparisonTable = ({ players }: Props) => {
-  const [sortField, setSortField] = useState<SortField>('medianPoints');
+export const PlayerComparisonTable = ({ players, totalCount, currentPage, pageSize }: Props) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  
+  const [sortField, setSortField] = useState<SortField>('totalPoints');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [filterPos, setFilterPos] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', newPage.toString());
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -44,7 +60,6 @@ export const PlayerComparisonTable = ({ players }: Props) => {
         return sortDirection === 'asc' ? res : -res;
       }
       
-      // Numbers
       const numA = Number(valA);
       const numB = Number(valB);
       if (numA < numB) return sortDirection === 'asc' ? -1 : 1;
@@ -62,46 +77,21 @@ export const PlayerComparisonTable = ({ players }: Props) => {
       <div className={styles.controls}>
         <div className={styles.leftControls}>
           <div className={styles.filters}>
-            <button 
-              type="button"
-              className={`${styles.filterBtn} ${filterPos === 'ALL' ? styles.active : ''}`}
-              onClick={() => setFilterPos('ALL')}
-            >
-              All
-            </button>
-            <button 
-              type="button"
-              className={`${styles.filterBtn} ${filterPos === 'GKP' ? styles.active : ''}`}
-              onClick={() => setFilterPos('GKP')}
-            >
-              GKP
-            </button>
-            <button 
-              type="button"
-              className={`${styles.filterBtn} ${filterPos === 'DEF' ? styles.active : ''}`}
-              onClick={() => setFilterPos('DEF')}
-            >
-              DEF
-            </button>
-            <button 
-              type="button"
-              className={`${styles.filterBtn} ${filterPos === 'MID' ? styles.active : ''}`}
-              onClick={() => setFilterPos('MID')}
-            >
-              MID
-            </button>
-            <button 
-              type="button"
-              className={`${styles.filterBtn} ${filterPos === 'FWD' ? styles.active : ''}`}
-              onClick={() => setFilterPos('FWD')}
-            >
-              FWD
-            </button>
+            {['ALL', 'GKP', 'DEF', 'MID', 'FWD'].map(pos => (
+              <button 
+                key={pos}
+                type="button"
+                className={`${styles.filterBtn} ${filterPos === pos ? styles.active : ''}`}
+                onClick={() => setFilterPos(pos)}
+              >
+                {pos === 'ALL' ? 'All' : pos}
+              </button>
+            ))}
           </div>
           <div className={styles.searchWrapper}>
             <input 
               type="text" 
-              placeholder="Search players..." 
+              placeholder="Search page..." 
               className={styles.searchInput}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -109,7 +99,7 @@ export const PlayerComparisonTable = ({ players }: Props) => {
           </div>
         </div>
         <div className={styles.count}>
-          Showing {sortedPlayers.length} players
+          Page {currentPage} of {totalPages} ({totalCount} players)
         </div>
       </div>
 
@@ -149,6 +139,45 @@ export const PlayerComparisonTable = ({ players }: Props) => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className={styles.pagination}>
+        <button 
+          type="button"
+          className={styles.pageBtn} 
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+        >
+          Previous
+        </button>
+        <div className={styles.pageNumbers}>
+          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+            let pageNum: number;
+            if (totalPages <= 5) pageNum = i + 1;
+            else if (currentPage <= 3) pageNum = i + 1;
+            else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+            else pageNum = currentPage - 2 + i;
+            
+            return (
+              <button 
+                key={pageNum}
+                type="button"
+                className={`${styles.pageNum} ${currentPage === pageNum ? styles.activePage : ''}`}
+                onClick={() => handlePageChange(pageNum)}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+        </div>
+        <button 
+          type="button"
+          className={styles.pageBtn} 
+          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

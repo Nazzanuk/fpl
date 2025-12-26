@@ -548,7 +548,7 @@ export async function getBestXI(leagueId: number) {
   const idsToProcess = Array.from(new Set([...topTotalIds, ...topPpgIds]));
   
   // Use existing aggregate service which includes caching and real trimean
-  const aggregatedPlayers = await getPlayerStatsAggregate(idsToProcess);
+  const { players: aggregatedPlayers } = await getPlayerStatsAggregate(idsToProcess);
   
   // Format into locally required structure
   const candidates = aggregatedPlayers
@@ -665,8 +665,8 @@ export async function getTransferRecommendations(managerId: number) {
   const managerPlayerIds = currentPicks.picks.map((p: any) => p.element);
   
   // Heuristic for potential upgrades: top players by current form
-  const topPlayers = await getPlayerStatsAggregate(); 
-  const managerPlayers = await getPlayerStatsAggregate(managerPlayerIds);
+  const { players: topPlayers } = await getPlayerStatsAggregate(); 
+  const { players: managerPlayers } = await getPlayerStatsAggregate(managerPlayerIds);
   
   console.log(`[RECS] Analyzing manager ${managerId}. Squad: ${managerPlayers.length} players. Pool: ${topPlayers.length} candidates.`);
   

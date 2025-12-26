@@ -59,7 +59,7 @@ const BestXIAsyncInner = async ({ leagueId, managerId }: Props) => {
       // Get player stats for manager's specific players
       const starters = team.picks.filter((p: any) => p.position <= 11);
       const starterIds = starters.map((p: any) => p.element);
-      const players = await getPlayerStatsAggregate(starterIds);
+      const { players } = await getPlayerStatsAggregate(starterIds);
 
       // Create BestXI-compatible object for the manager's actual team
       const managerPlayers = starters.map((pick: any) => players.find((p: any) => p.id === pick.element)).filter(Boolean) as any[];

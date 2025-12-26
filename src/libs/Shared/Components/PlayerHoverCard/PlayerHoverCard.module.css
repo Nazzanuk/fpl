@@ -77,11 +77,11 @@
   height: 12px;
 }
 
-.fixtureDifficulty[data-fdr="1"] { background: #00ff85; }
-.fixtureDifficulty[data-fdr="2"] { background: #00ff85; }
-.fixtureDifficulty[data-fdr="3"] { background: #ebebe0; }
-.fixtureDifficulty[data-fdr="4"] { background: #ff005a; }
-.fixtureDifficulty[data-fdr="5"] { background: #ff005a; }
+.fixtureDifficulty[data-fdr="1"] { background: var(--positive); }
+.fixtureDifficulty[data-fdr="2"] { background: var(--positive); }
+.fixtureDifficulty[data-fdr="3"] { background: var(--gold); }
+.fixtureDifficulty[data-fdr="4"] { background: var(--negative); }
+.fixtureDifficulty[data-fdr="5"] { background: var(--negative); }
 
 .clickHint {
   margin-top: 0.25rem;

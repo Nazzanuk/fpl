@@ -1,6 +1,6 @@
-# FPL Live Design System
+# FPL Alchemy Design System
 
-A comprehensive design specification for the FPL Live application, inspired by premium sports TV broadcasting graphics. This document details every aspect of the visual language, from color palettes to typography, spacing systems, and component patterns.
+A comprehensive design specification for the FPL Alchemy application, inspired by premium sports TV broadcasting graphics. This document details every aspect of the visual language, from color palettes to typography, spacing systems, and component patterns.
 
 ---
 
@@ -1058,4 +1058,4 @@ font-feature-settings: "tnum";
 
 ---
 
-*This design system is inspired by premium sports broadcasting graphics and is specifically tailored for the FPL Live application. All patterns and specifications should be followed consistently to maintain visual coherence across the application.*
+*This design system is inspired by premium sports broadcasting graphics and is specifically tailored for the FPL Alchemy application. All patterns and specifications should be followed consistently to maintain visual coherence across the application.*

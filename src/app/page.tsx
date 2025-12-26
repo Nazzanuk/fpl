@@ -8,7 +8,7 @@ export default function Home() {
       <div className={styles.container}>
         <header className={styles.header}>
           <div className={styles.brand}>
-            FPL<span className={styles.brandAccent}>Live</span>
+            FPL<span className={styles.brandAccent}>Alchemy</span>
           </div>
           <div className={styles.headerBadge}>Season 2024/25</div>
         </header>

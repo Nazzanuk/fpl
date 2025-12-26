@@ -15,6 +15,7 @@ import pLimit from 'p-limit';
 const limit = pLimit(5);
 
 import { calculateTrimean, calculateMedian } from '../Utils/MathUtils';
+import type { PlayerStatSummary } from '../Types';
 
 
 
@@ -131,14 +132,22 @@ const playerStatsCache = new Map<number, { median: number; trimean: number }>();
 /**
  * Get aggregated player statistics with real Tukey's Trimean
  */
-export async function getPlayerStatsAggregate(elementIds?: number[]) {
+export async function getPlayerStatsAggregate(elementIds?: number[], limit_count?: number, offset?: number) {
   const bootstrap = await getBootstrapStatic();
 
   // If no elementIds provided, return all active players sorted by total points
-  const idsToProcess = elementIds || bootstrap.elements
+  let idsToProcess = elementIds || bootstrap.elements
     .filter((el: any) => el.status !== 'u' && el.status !== 'n') // Only active/available players
     .sort((a: any, b: any) => b.total_points - a.total_points)
     .map((el: any) => el.id);
+
+  const totalCount = idsToProcess.length;
+
+  // Apply pagination if specified
+  if (limit_count !== undefined) {
+    const start = offset || 0;
+    idsToProcess = idsToProcess.slice(start, start + limit_count);
+  }
 
   // Identify which IDs are already in cache
   const uncachedIds = idsToProcess.filter((id: number) => !playerStatsCache.has(id));
@@ -188,31 +197,34 @@ export async function getPlayerStatsAggregate(elementIds?: number[]) {
     );
   }
 
-  return idsToProcess.map((elementId: number) => {
-    const element = bootstrap.elements.find((el: any) => el.id === elementId);
-    if (!element) return null;
+  return {
+    players: idsToProcess.map((elementId: number) => {
+      const element = bootstrap.elements.find((el: any) => el.id === elementId);
+      if (!element) return null;
 
-    const team = bootstrap.teams.find((t: any) => t.id === element.team);
-    const pointsPerGame = parseFloat(element.points_per_game) || 0;
-    const stats = playerStatsCache.get(elementId);
+      const team = bootstrap.teams.find((t: any) => t.id === element.team);
+      const pointsPerGame = parseFloat(element.points_per_game) || 0;
+      const stats = playerStatsCache.get(elementId);
 
-    return {
-      id: element.id,
-      webName: element.web_name,
-      teamName: team?.name || '',
-      teamShortName: team?.short_name || '',
-      position: getPositionName(element.element_type),
-      cost: element.now_cost / 10,
-      totalPoints: element.total_points,
-      averagePoints: pointsPerGame,
-      medianPoints: (stats?.median !== undefined && !Number.isNaN(stats.median)) ? stats.median : pointsPerGame,
-      trimean: (stats?.trimean !== undefined && !Number.isNaN(stats.trimean)) ? stats.trimean : pointsPerGame,
-      lastGwPoints: element.event_points || 0,
-      matchesPlayed: element.minutes > 0 ? Math.floor(element.minutes / 90) : 0,
-      injuryStatus: element.news || null,
-      status: element.status, // 'a' = available, 'i' = injured, etc.
-    };
-  }).filter(Boolean);
+      return {
+        id: element.id,
+        webName: element.web_name,
+        teamName: team?.name || '',
+        teamShortName: team?.short_name || '',
+        position: getPositionName(element.element_type),
+        cost: element.now_cost / 10,
+        totalPoints: element.total_points,
+        averagePoints: pointsPerGame,
+        medianPoints: (stats?.median !== undefined && !Number.isNaN(stats.median)) ? stats.median : pointsPerGame,
+        trimean: (stats?.trimean !== undefined && !Number.isNaN(stats.trimean)) ? stats.trimean : pointsPerGame,
+        lastGwPoints: element.event_points || 0,
+        matchesPlayed: element.minutes > 0 ? Math.floor(element.minutes / 90) : 0,
+        injuryStatus: element.news || null,
+        status: element.status, // 'a' = available, 'i' = injured, etc.
+      };
+    }).filter(Boolean) as PlayerStatSummary[],
+    totalCount
+  };
 }
 
 function getPositionName(elementType: number): string {

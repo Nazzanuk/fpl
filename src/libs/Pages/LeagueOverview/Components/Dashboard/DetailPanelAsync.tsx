@@ -9,7 +9,7 @@ import { DetailPanelSkeleton } from './Skeletons/DetailPanelSkeleton';
 // Define locally since shared import is missing
 type DetailPageProps = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ manager?: string; view?: string }>;
+  searchParams: Promise<{ manager?: string; view?: string; page?: string }>;
   viewOverride?: string;
 };
 
@@ -29,7 +29,7 @@ const DetailPanelAsyncInner = async ({ params, searchParams, viewOverride }: Det
   const currentView = viewOverride || view || 'standings';
 
   if (currentView === 'players') {
-    return <PlayerComparisonAsync />;
+    return <PlayerComparisonAsync searchParams={searchParams} />;
   }
 
   if (currentView === 'best-xi') {

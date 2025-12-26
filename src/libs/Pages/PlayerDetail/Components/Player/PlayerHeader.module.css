@@ -75,7 +75,7 @@
 }
 
 .statusBadge[data-status="d"] {
-  background: #f97316;
+  background: var(--gold-dark);
   color: white;
 }
 

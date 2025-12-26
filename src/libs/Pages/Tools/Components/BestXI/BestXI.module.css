@@ -84,7 +84,7 @@
 }
 
 .negative {
-  color: var(--red);
+  color: var(--negative);
 }
 
 .pitchHeader {

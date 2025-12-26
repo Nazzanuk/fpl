@@ -1,10 +1,7 @@
-/**
- * FPL API Client - Low-level API fetching with caching
- * Following CLAUDE.md specification: 60s revalidation, User-Agent spoofing
- */
+import { cacheLife, cacheTag } from 'next/cache';
 
 const FPL_API_BASE = 'https://fantasy.premierleague.com/api';
-const USER_AGENT = 'Mozilla/5.0 (compatible; FPLLive/1.0)';
+const USER_AGENT = 'Mozilla/5.0 (compatible; FPLAlchemy/1.0)';
 
 /**
  * Core fetch wrapper with Next.js caching and User-Agent spoofing
@@ -37,6 +34,10 @@ async function fplFetch<T>(endpoint: string, revalidate = 60): Promise<T> {
  * We use cache: 'no-store' to bypass the problematic internal cache.
  */
 export async function getBootstrapStatic() {
+  'use cache'
+  cacheTag('bootstrap', 'gameweek-data');
+  cacheLife('static');
+
   const url = `${FPL_API_BASE}/bootstrap-static/`;
   
   try {
@@ -60,6 +61,9 @@ export async function getBootstrapStatic() {
  * League standings and manager list
  */
 export async function getLeagueManagers(leagueId: number) {
+  'use cache'
+  cacheTag('league', `league-${leagueId}`);
+  cacheLife('gameweek');
   return fplFetch<any>(`/leagues-classic/${leagueId}/standings/`);
 }
 
@@ -67,6 +71,9 @@ export async function getLeagueManagers(leagueId: number) {
  * Manager's picks for a specific gameweek
  */
 export async function getManagerPicks(entryId: number, eventId: number) {
+  'use cache'
+  cacheTag('manager-picks', `manager-${entryId}`, `gw-${eventId}`);
+  cacheLife('gameweek');
   return fplFetch<any>(`/entry/${entryId}/event/${eventId}/picks/`);
 }
 
@@ -74,6 +81,9 @@ export async function getManagerPicks(entryId: number, eventId: number) {
  * Manager's history (all gameweeks)
  */
 export async function getManagerHistory(entryId: number) {
+  'use cache'
+  cacheTag('manager-history', `manager-${entryId}`);
+  cacheLife('historical');
   return fplFetch<any>(`/entry/${entryId}/history/`);
 }
 
@@ -81,6 +91,9 @@ export async function getManagerHistory(entryId: number) {
  * Live gameweek data (real-time player scores)
  */
 export async function getEventLive(eventId: number) {
+  'use cache'
+  cacheTag('live-scores', `gw-${eventId}`);
+  cacheLife('live');
   return fplFetch<any>(`/event/${eventId}/live/`, 30); // 30s cache for live data
 }
 
@@ -88,6 +101,9 @@ export async function getEventLive(eventId: number) {
  * Fixtures for a specific gameweek
  */
 export async function getFixtures(eventId: number) {
+  'use cache'
+  cacheTag('fixtures', `gw-${eventId}`);
+  cacheLife('gameweek');
   return fplFetch<any>(`/fixtures/?event=${eventId}`);
 }
 
@@ -95,6 +111,9 @@ export async function getFixtures(eventId: number) {
  * All fixtures (all gameweeks)
  */
 export async function getAllFixtures() {
+  'use cache'
+  cacheTag('fixtures-all');
+  cacheLife('static');
   return fplFetch<any>('/fixtures/');
 }
 
@@ -102,6 +121,9 @@ export async function getAllFixtures() {
  * Player element summary (detailed player stats)
  */
 export async function getElementSummary(elementId: number) {
+  'use cache'
+  cacheTag('element-summary', `player-${elementId}`);
+  cacheLife('historical');
   return fplFetch<any>(`/element-summary/${elementId}/`);
 }
 
