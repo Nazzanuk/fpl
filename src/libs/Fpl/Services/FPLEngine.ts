@@ -14,6 +14,9 @@ import {
 } from '../Data/Client/FPLApiClient';
 import { getPlayerStatsAggregate } from './AnalyticsEngine';
 
+import { cacheLife, cacheTag } from 'next/cache';
+import { getGameweekStatus } from '../Utils/GameweekStatus';
+
 const limit = pLimit(5); // Concurrency control - max 5 concurrent requests
 
 import { calculateTrimean } from '../Utils/MathUtils';
@@ -84,6 +87,13 @@ export interface LiveScore {
  * Following CLAUDE.md specification
  */
 export async function buildLiveTable(leagueId: number): Promise<LiveScore[]> {
+  'use cache'
+  cacheTag('live-table', `league-${leagueId}`);
+  
+  // Dynamic cache life based on live status
+  const { isLive } = await getGameweekStatus();
+  cacheLife(isLive ? 'live' : 'gameweek');
+
   // 1. Fetch current gameweek from bootstrap-static
   const bootstrap = await getBootstrapStatic();
   const currentEvent = bootstrap.events.find((e: any) => e.is_current);
@@ -247,6 +257,12 @@ export async function buildLiveTable(leagueId: number): Promise<LiveScore[]> {
  * Get simplified manager detail
  */
 export async function getManagerDetailSimple(leagueId: number, managerId: number) {
+  'use cache'
+  cacheTag('manager-detail', `manager-${managerId}`, `league-${leagueId}`);
+  
+  const { isLive } = await getGameweekStatus();
+  cacheLife(isLive ? 'live' : 'gameweek');
+
   const bootstrap = await getBootstrapStatic();
   const currentEvent = bootstrap.events.find((e: any) => e.is_current);
 
@@ -379,6 +395,10 @@ export async function getManagerDetailSimple(leagueId: number, managerId: number
  * Get differential players in a league (unique and missing)
  */
 export async function getDifferentials(leagueId: number, managerId: number) {
+  'use cache'
+  cacheTag('differentials', `league-${leagueId}`, `manager-${managerId}`);
+  cacheLife('gameweek');
+
   const bootstrap = await getBootstrapStatic();
   const currentEvent = bootstrap.events.find((e: any) => e.is_current);
 
@@ -458,6 +478,10 @@ export async function getDifferentials(leagueId: number, managerId: number) {
  * Get league-wide player ownership
  */
 export async function getLeaguePlayerOwnership(leagueId: number) {
+  'use cache'
+  cacheTag('ownership', `league-${leagueId}`);
+  cacheLife('gameweek');
+
   const bootstrap = await getBootstrapStatic();
   const currentEvent = bootstrap.events.find((e: any) => e.is_current);
 
@@ -531,6 +555,10 @@ function getPositionName(elementType: number): string {
  * Uses greedy algorithm to build optimal squad within budget
  */
 export async function getBestXI(leagueId: number) {
+  'use cache'
+  cacheTag('best-xi');
+  cacheLife('static');
+
   const bootstrap = await getBootstrapStatic();
   
   // Identify top candidates by total points and ppg for trimean fetching
@@ -645,6 +673,10 @@ export async function getBestXI(leagueId: number) {
  * Compares current squad to optimal alternatives with fixture difficulty analysis
  */
 export async function getTransferRecommendations(managerId: number) {
+  'use cache'
+  cacheTag('recommendations', `manager-${managerId}`);
+  cacheLife('gameweek');
+
   const bootstrap = await getBootstrapStatic();
   const currentEvent = bootstrap.events.find((e: any) => e.is_current);
 
