@@ -22,10 +22,7 @@ import { calculateTrimean, calculateMedian } from '../Utils/MathUtils';
  * Get league trends and analytics
  */
 export async function getLeagueTrends(leagueId: number): Promise<LeagueTrend[]> {
-  const [bootstrap, leagueData] = await Promise.all([
-    getBootstrapStatic(),
-    getLeagueManagers(leagueId),
-  ]);
+  const leagueData = await getLeagueManagers(leagueId);
 
   const managers = leagueData.standings.results;
 
@@ -137,10 +134,10 @@ const playerStatsCache = new Map<number, { median: number; trimean: number }>();
 export async function getPlayerStatsAggregate(elementIds?: number[]) {
   const bootstrap = await getBootstrapStatic();
 
-  // If no elementIds provided, return top 400 players by total points
+  // If no elementIds provided, return all active players sorted by total points
   const idsToProcess = elementIds || bootstrap.elements
+    .filter((el: any) => el.status !== 'u' && el.status !== 'n') // Only active/available players
     .sort((a: any, b: any) => b.total_points - a.total_points)
-    .slice(0, 500)
     .map((el: any) => el.id);
 
   // Identify which IDs are already in cache

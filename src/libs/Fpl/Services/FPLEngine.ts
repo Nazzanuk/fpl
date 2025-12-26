@@ -736,7 +736,6 @@ export async function getTransferRecommendations(managerId: number) {
       
       // Threshold set to 0.1 to show ANY positive move.
       if (effectiveness > 0.1) { 
-        console.log(`[RECS]   UPGRADE: ${alt.webName} (+${trimeanDiff.toFixed(2)}) score=${effectiveness.toFixed(2)}`);
         recommendations.push({
           playerOut: current,
           playerIn: alt,
@@ -753,14 +752,23 @@ export async function getTransferRecommendations(managerId: number) {
     }
   }
 
-  // 5. Finalize top 12 (Greedy selection to respect budget and avoid overlap)
-  const filtered = recommendations
-    .sort((a, b) => b.effectivenessScore - a.effectivenessScore)
-    .filter((rec, i, self) => 
-      self.findIndex(s => s.playerIn.id === rec.playerIn.id) === i &&
-      self.findIndex(s => s.playerOut.id === rec.playerOut.id) === i
-    );
+  // 5. Finalize top 12 using Proper Greedy Selection
+  // This ensures we get the best unique moves without skipping players inadvertently
+  const sortedRecs = recommendations.sort((a, b) => b.effectivenessScore - a.effectivenessScore);
+  const finalRecs: any[] = [];
+  const usedIn = new Set<number>();
+  const usedOut = new Set<number>();
+
+  for (const rec of sortedRecs) {
+    if (finalRecs.length >= 12) break;
     
-  console.log(`[RECS] Found ${recommendations.length} candidate moves, ${filtered.length} unique moves. Slicing to 12.`);
-  return filtered.slice(0, 12);
+    // Only allow each player to be transferred OUT once, 
+    // and each target player to be transferred IN once.
+    if (!usedIn.has(rec.playerIn.id) && !usedOut.has(rec.playerOut.id)) {
+      finalRecs.push(rec);
+      usedIn.add(rec.playerIn.id);
+      usedOut.add(rec.playerOut.id);
+    }
+  }
+  return finalRecs;
 }
