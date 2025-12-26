@@ -6,11 +6,10 @@ import { PlayerComparisonAsync } from '../../../PlayerDetail/Components/Player/P
 import { BestXIAsync } from '../../../Tools/Components/BestXI/BestXIAsync';
 import { DetailPanelSkeleton } from './Skeletons/DetailPanelSkeleton';
 
-// Define locally since shared import is missing
 type DetailPageProps = {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ manager?: string; view?: string; page?: string }>;
-  viewOverride?: string;
+  leagueId: number;
+  managerId?: number;
+  view: string;
 };
 
 export const DetailPanelAsync = (props: DetailPageProps) => {
@@ -21,26 +20,24 @@ export const DetailPanelAsync = (props: DetailPageProps) => {
   );
 };
 
-const DetailPanelAsyncInner = async ({ params, searchParams, viewOverride }: DetailPageProps) => {
-  const { id } = await params;
-  const { manager, view } = await searchParams;
-  const leagueId = parseInt(id, 10);
-  const selectedManagerId = manager ? parseInt(manager, 10) : undefined;
-  const currentView = viewOverride || view || 'standings';
-
-  if (currentView === 'players') {
-    return <PlayerComparisonAsync searchParams={searchParams} />;
+const DetailPanelAsyncInner = async ({ leagueId, managerId, view }: DetailPageProps) => {
+  if (view === 'players') {
+    return <PlayerComparisonAsync />;
   }
 
-  if (currentView === 'best-xi') {
-    return <BestXIAsync leagueId={leagueId} managerId={selectedManagerId} />;
+  if (view === 'dream-team') {
+    return <BestXIAsync leagueId={leagueId} managerId={managerId} mode="dream" />;
+  }
+
+  if (view === 'my-team') {
+    return <BestXIAsync leagueId={leagueId} managerId={managerId} mode="manager" />;
   }
   
   return (
     <DetailPanel
       leagueId={leagueId}
-      managerId={selectedManagerId}
-      view={currentView}
+      managerId={managerId}
+      view={view}
     />
   );
 };

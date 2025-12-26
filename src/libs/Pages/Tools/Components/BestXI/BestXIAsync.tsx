@@ -10,6 +10,7 @@ import styles from './BestXI.module.css';
 type Props = {
   leagueId?: number;
   managerId?: number;
+  mode?: 'dream' | 'manager';
 };
 
 export const BestXIAsync = (props: Props) => {
@@ -38,7 +39,7 @@ const BestXIAsyncSkeleton = () => {
   );
 };
 
-const BestXIAsyncInner = async ({ leagueId, managerId }: Props) => {
+const BestXIAsyncInner = async ({ leagueId, managerId, mode }: Props) => {
   'use cache'
   cacheTag('best-xi', leagueId ? `league-${leagueId}` : 'all');
   cacheLife('gameweek');
@@ -87,5 +88,5 @@ const BestXIAsyncInner = async ({ leagueId, managerId }: Props) => {
     }
   }
 
-  return <BestXIView bestXI={bestXI} recommendations={recommendations} managerTeam={managerTeam} />;
+  return <BestXIView bestXI={bestXI} recommendations={recommendations} managerTeam={managerTeam} defaultMode={mode} />;
 };

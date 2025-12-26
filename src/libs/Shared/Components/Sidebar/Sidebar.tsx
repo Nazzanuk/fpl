@@ -1,28 +1,59 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import styles from './Sidebar.module.css';
 
-type ViewType = 'standings' | 'h2h' | 'differentials' | 'ownership' | 'history' | 'trends' | 'fdr' | 'transfers' | 'chips' | 'top' | 'fixtures' | 'players' | 'best-xi';
+type ViewType = 'standings' | 'h2h' | 'differentials' | 'ownership' | 'history' | 'trends' | 'fdr' | 'transfers' | 'chips' | 'top' | 'fixtures' | 'players' | 'dream-team' | 'my-team';
 
 type Props = {
   leagueId: number;
-  currentView: string;
-  selectedManagerId?: number;
 };
 
-export const Sidebar = ({ leagueId, currentView, selectedManagerId }: Props) => {
+// Derive current view and manager from pathname
+const parsePathname = (pathname: string) => {
+  const parts = pathname.split('/').filter(Boolean);
+  // Expected patterns:
+  // /league/[id] - default (standings)
+  // /league/[id]/[view] - view-only (players, fixtures, etc.)
+  // /league/[id]/manager/[managerId] - manager default
+  // /league/[id]/manager/[managerId]/[view] - manager + view
+
+  let currentView = 'standings';
+  let managerId: number | undefined;
+
+  if (parts[0] === 'league' && parts.length >= 2) {
+    if (parts[2] === 'manager' && parts[3]) {
+      managerId = parseInt(parts[3], 10);
+      currentView = parts[4] || 'standings';
+    } else if (parts[2]) {
+      currentView = parts[2];
+    }
+  }
+
+  return { currentView, managerId };
+};
+
+export const Sidebar = ({ leagueId }: Props) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  
+  const { currentView, managerId } = parsePathname(pathname);
 
   const handleViewChange = (view: ViewType) => {
-    const params = new URLSearchParams();
-    params.set('view', view);
-    if (selectedManagerId) {
-      params.set('manager', String(selectedManagerId));
+    // Manager-required views
+    const managerRequiredViews = ['standings', 'h2h', 'transfers', 'chips', 'history', 'dream-team', 'my-team'];
+    
+    if (managerRequiredViews.includes(view) && managerId) {
+      router.push(`/league/${leagueId}/manager/${managerId}/${view}`);
+    } else if (managerRequiredViews.includes(view) && !managerId) {
+      // Navigate to view-only version or stay at league level
+      router.push(`/league/${leagueId}/${view}`);
+    } else {
+      // View-only routes (players, fixtures, top, trends, etc.)
+      router.push(`/league/${leagueId}/${view}`);
     }
-    router.push(`/league/${leagueId}?${params.toString()}`);
   };
 
   const sections = [
@@ -39,7 +70,8 @@ export const Sidebar = ({ leagueId, currentView, selectedManagerId }: Props) => 
       title: 'Tools & Planning',
       items: [
         { id: 'transfers', label: 'Transfer Planner', icon: 'swap_horiz' },
-        { id: 'best-xi', label: 'Dream Team', icon: 'hotel_class' },
+        { id: 'dream-team', label: 'Dream Team', icon: 'hotel_class' },
+        { id: 'my-team', label: 'My Team', icon: 'groups' },
         { id: 'fdr', label: 'FDR Planner', icon: 'calendar_month' },
         { id: 'chips', label: 'Chip Advisor', icon: 'confirmation_number' },
       ],

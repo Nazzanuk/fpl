@@ -7,8 +7,6 @@ import styles from './StandingsList.module.css';
 
 type PageProps = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ manager?: string; view?: string }>;
-  viewOverride?: string;
 };
 
 export const StandingsAsync = (props: PageProps) => {
@@ -38,27 +36,22 @@ const StandingsAsyncSkeleton = () => (
   </div>
 );
 
-const StandingsAsyncInner = async ({ params, searchParams, viewOverride }: PageProps) => {
+const StandingsAsyncInner = async ({ params }: PageProps) => {
   'use cache'
   const { id } = await params;
-  const { manager, view } = await searchParams;
-  
+
   cacheTag('standings', `league-${id}`);
-  
+
   const { isLive } = await getGameweekStatus();
   cacheLife(isLive ? 'live' : 'gameweek' as any);
 
   const leagueId = parseInt(id, 10);
-  const selectedManagerId = manager ? parseInt(manager, 10) : undefined;
-  
   const scores = await buildLiveTable(leagueId);
 
   return (
     <StandingsListServer
       leagueId={leagueId}
       scores={scores}
-      selectedManagerId={selectedManagerId}
-      view={viewOverride || view || 'standings'}
     />
   );
 };

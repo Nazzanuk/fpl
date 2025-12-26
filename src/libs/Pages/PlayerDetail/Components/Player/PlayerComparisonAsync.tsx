@@ -6,7 +6,7 @@ import { PlayerComparisonTable } from './PlayerComparisonTable';
 import styles from './PlayerComparisonTable.module.css';
 
 type Props = {
-  searchParams: Promise<{ page?: string }>;
+  searchParams?: Promise<{ page?: string }>;
 };
 
 export const PlayerComparisonAsync = ({ searchParams }: Props) => {
@@ -37,7 +37,8 @@ const PlayerComparisonAsyncSkeleton = () => {
 
 const PlayerComparisonAsyncInner = async ({ searchParams }: Props) => {
   'use cache'
-  const { page } = await searchParams;
+  const resolvedParams = searchParams ? await searchParams : { page: undefined };
+  const { page } = resolvedParams;
   const currentPage = page ? parseInt(page, 10) : 1;
   const pageSize = 20;
   const offset = (currentPage - 1) * pageSize;

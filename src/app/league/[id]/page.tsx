@@ -1,10 +1,7 @@
-import { DashboardPage } from '@/libs/Pages/LeagueOverview/Components/Dashboard/DashboardPage';
+// This page exists for Next.js routing but content is rendered via slots
+// @standings slot renders the standings table
+// @detail slot renders the detail panel (default empty state)
 
-type PageProps = {
-  params: Promise<{ id: string }>;
-  searchParams: Promise<{ manager?: string; view?: string }>;
-};
-
-export default function LeaguePage(props: PageProps) {
-  return <DashboardPage {...props} />;
+export default function LeaguePage() {
+  return null;
 }

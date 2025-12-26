@@ -10,10 +10,11 @@ type Props = {
   bestXI: BestXI;
   recommendations: RecommendedTransfer[];
   managerTeam?: (BestXI & { activeChip?: string | null }) | null;
+  defaultMode?: 'dream' | 'manager';
 };
 
-export const BestXIView = ({ bestXI, recommendations, managerTeam }: Props) => {
-  const [viewMode, setViewMode] = useState<'dream' | 'manager'>('dream');
+export const BestXIView = ({ bestXI, recommendations, managerTeam, defaultMode }: Props) => {
+  const [viewMode, setViewMode] = useState<'dream' | 'manager'>(defaultMode || 'dream');
 
   // If no manager team, force dream view
   const currentTeam = (viewMode === 'manager' && managerTeam) ? managerTeam : bestXI;
