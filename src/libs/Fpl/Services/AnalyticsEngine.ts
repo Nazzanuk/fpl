@@ -12,6 +12,8 @@ import {
 } from '../Data/Client/FPLApiClient';
 import pLimit from 'p-limit';
 
+import { cacheLife, cacheTag } from 'next/cache';
+
 const limit = pLimit(5);
 
 import { calculateTrimean, calculateMedian } from '../Utils/MathUtils';
@@ -23,6 +25,10 @@ import type { PlayerStatSummary } from '../Types';
  * Get league trends and analytics
  */
 export async function getLeagueTrends(leagueId: number): Promise<LeagueTrend[]> {
+  'use cache'
+  cacheTag('league-trends', `league-${leagueId}`);
+  cacheLife('gameweek' as any);
+
   const leagueData = await getLeagueManagers(leagueId);
 
   const managers = leagueData.standings.results;
@@ -62,6 +68,10 @@ export async function getLeagueTrends(leagueId: number): Promise<LeagueTrend[]> 
  * Get manager history data with analytics
  */
 export async function getManagerHistoryData(managerId: number, leagueId?: number): Promise<ManagerHistoryData> {
+  'use cache'
+  cacheTag('manager-history-data', `manager-${managerId}`);
+  cacheLife('gameweek' as any);
+
   const history = await getManagerHistory(managerId);
 
   // Fetch manager details if leagueId provided
@@ -133,6 +143,10 @@ const playerStatsCache = new Map<number, { median: number; trimean: number }>();
  * Get aggregated player statistics with real Tukey's Trimean
  */
 export async function getPlayerStatsAggregate(elementIds?: number[], limit_count?: number, offset?: number) {
+  'use cache'
+  cacheTag('player-stats-aggregate');
+  cacheLife('gameweek');
+
   const bootstrap = await getBootstrapStatic();
 
   // If no elementIds provided, return all active players sorted by total points
@@ -318,6 +332,10 @@ export interface PriceChangePlayer {
  * Get chip recommendations for a manager based on team and fixtures
  */
 export async function getChipRecommendations(managerId: number): Promise<ChipRecommendation[]> {
+  'use cache'
+  cacheTag('chip-recommendations', `manager-${managerId}`);
+  cacheLife('gameweek' as any);
+
   const [bootstrap, history, fixtures] = await Promise.all([
     getBootstrapStatic(),
     getManagerHistory(managerId),
@@ -498,6 +516,10 @@ export async function getChipRecommendations(managerId: number): Promise<ChipRec
  * Get FDR (Fixture Difficulty Rating) data for upcoming gameweeks
  */
 export async function getFDRData(gameweeks = 5): Promise<FDRData[]> {
+  'use cache'
+  cacheTag('fdr-data', `gw-range-${gameweeks}`);
+  cacheLife('static' as any);
+
   const [bootstrap, fixtures] = await Promise.all([
     getBootstrapStatic(),
     getAllFixtures(),
@@ -578,6 +600,10 @@ export interface TopPerformersData {
  * Get top performers across all FPL
  */
 export async function getTopPerformers(leagueId?: number): Promise<TopPerformersData> {
+  'use cache'
+  cacheTag('top-performers', leagueId ? `league-${leagueId}` : 'all');
+  cacheLife('gameweek' as any);
+
   const bootstrap = await getBootstrapStatic();
 
   // Map elements to TopPlayer format
@@ -644,6 +670,10 @@ export interface PriceChangeData {
  * Get players with price changes
  */
 export async function getPriceChangePlayers(): Promise<PriceChangeData> {
+  'use cache'
+  cacheTag('price-changes');
+  cacheLife('gameweek' as any);
+
   const bootstrap = await getBootstrapStatic();
 
   // Map elements to PriceChangePlayer format

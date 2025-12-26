@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
 import { getTopPerformers } from '../../../../Fpl/Services/AnalyticsEngine';
 import { TopPerformersContent } from './TopPerformersContent';
 import styles from './TopPerformers.module.css';
@@ -25,6 +26,10 @@ const TopPerformersSkeleton = () => {
 };
 
 const TopPerformersInner = async () => {
+  'use cache'
+  cacheTag('top-performers');
+  cacheLife('gameweek' as any);
+
   const data = await getTopPerformers();
 
   return <TopPerformersContent data={data} />;

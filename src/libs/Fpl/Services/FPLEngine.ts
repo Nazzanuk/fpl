@@ -92,7 +92,7 @@ export async function buildLiveTable(leagueId: number): Promise<LiveScore[]> {
   
   // Dynamic cache life based on live status
   const { isLive } = await getGameweekStatus();
-  cacheLife(isLive ? 'live' : 'gameweek');
+  cacheLife(isLive ? 'live' : 'gameweek' as any);
 
   // 1. Fetch current gameweek from bootstrap-static
   const bootstrap = await getBootstrapStatic();
@@ -261,7 +261,7 @@ export async function getManagerDetailSimple(leagueId: number, managerId: number
   cacheTag('manager-detail', `manager-${managerId}`, `league-${leagueId}`);
   
   const { isLive } = await getGameweekStatus();
-  cacheLife(isLive ? 'live' : 'gameweek');
+  cacheLife(isLive ? 'live' : 'gameweek' as any);
 
   const bootstrap = await getBootstrapStatic();
   const currentEvent = bootstrap.events.find((e: any) => e.is_current);
@@ -397,7 +397,7 @@ export async function getManagerDetailSimple(leagueId: number, managerId: number
 export async function getDifferentials(leagueId: number, managerId: number) {
   'use cache'
   cacheTag('differentials', `league-${leagueId}`, `manager-${managerId}`);
-  cacheLife('gameweek');
+  cacheLife('gameweek' as any);
 
   const bootstrap = await getBootstrapStatic();
   const currentEvent = bootstrap.events.find((e: any) => e.is_current);
@@ -480,7 +480,7 @@ export async function getDifferentials(leagueId: number, managerId: number) {
 export async function getLeaguePlayerOwnership(leagueId: number) {
   'use cache'
   cacheTag('ownership', `league-${leagueId}`);
-  cacheLife('gameweek');
+  cacheLife('gameweek' as any);
 
   const bootstrap = await getBootstrapStatic();
   const currentEvent = bootstrap.events.find((e: any) => e.is_current);
@@ -557,7 +557,7 @@ function getPositionName(elementType: number): string {
 export async function getBestXI(leagueId: number) {
   'use cache'
   cacheTag('best-xi');
-  cacheLife('static');
+  cacheLife('gameweek' as any);
 
   const bootstrap = await getBootstrapStatic();
   
@@ -675,7 +675,7 @@ export async function getBestXI(leagueId: number) {
 export async function getTransferRecommendations(managerId: number) {
   'use cache'
   cacheTag('recommendations', `manager-${managerId}`);
-  cacheLife('gameweek');
+  cacheLife('gameweek' as any);
 
   const bootstrap = await getBootstrapStatic();
   const currentEvent = bootstrap.events.find((e: any) => e.is_current);

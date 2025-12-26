@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 import { buildLiveTable } from '../../../Fpl/Services/FPLEngine';
 import { ManagerRow } from './ManagerRow';
+import { cacheLife, cacheTag } from 'next/cache';
+import { getGameweekStatus } from '../../../Fpl/Utils/GameweekStatus';
 import styles from './LiveTable.module.css';
 
 type Props = {
@@ -20,6 +22,12 @@ const LiveTableSkeleton = () => {
 };
 
 const LiveTableInner = async ({ leagueId }: Props) => {
+  'use cache'
+  cacheTag('live-table', `league-${leagueId}`);
+  
+  const { isLive } = await getGameweekStatus();
+  cacheLife(isLive ? 'live' : 'gameweek' as any);
+
   const scores = await buildLiveTable(leagueId);
 
   return (

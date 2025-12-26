@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
 import { getFDRData } from '../../../../Fpl/Services/AnalyticsEngine';
 import { FDRPlannerContent } from './FDRPlannerContent';
 import styles from './FDRPlanner.module.css';
@@ -25,6 +26,10 @@ const FDRPlannerSkeleton = () => {
 };
 
 const FDRPlannerInner = async () => {
+  'use cache'
+  cacheTag('fdr-planner');
+  cacheLife('static' as any);
+
   const fdrData = await getFDRData(6);
 
   return <FDRPlannerContent teams={fdrData} />;

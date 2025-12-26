@@ -9,7 +9,7 @@ import styles from './BestXI.module.css';
 type Props = {
   bestXI: BestXI;
   recommendations: RecommendedTransfer[];
-  managerTeam?: BestXI | null;
+  managerTeam?: (BestXI & { activeChip?: string | null }) | null;
 };
 
 export const BestXIView = ({ bestXI, recommendations, managerTeam }: Props) => {
@@ -76,7 +76,10 @@ export const BestXIView = ({ bestXI, recommendations, managerTeam }: Props) => {
         <div className={styles.pitchSection}>
           <div className={styles.pitchHeader}>
              <h3 className={styles.sectionTitle}>
-               {viewMode === 'dream' ? 'Theoretical Best XI' : 'Your Starting XI'}
+                {viewMode === 'dream' ? 'Theoretical Best XI' : 'Your Starting XI'}
+                {viewMode === 'manager' && managerTeam?.activeChip && (
+                  <span className={styles.chipBadge}>{managerTeam.activeChip.toUpperCase()} ACTIVE</span>
+                )}
              </h3>
           </div>
           <div className={styles.pitch}>

@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,10 +13,43 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 export const metadata: Metadata = {
   title: "FPL Alchemy | Live Fantasy Premier League Tracker",
   description: "Track your FPL mini-league in real time. Live scores, projected bonus points, auto-subs, and captain performance.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "FPL Alchemy",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    title: "FPL Alchemy",
+    description: "Track your FPL mini-league in real time. Live scores, bonus points, and auto-subs.",
+    url: "https://fplalchemy.com",
+    siteName: "FPL Alchemy",
+    locale: "en_GB",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FPL Alchemy",
+    description: "Live Fantasy Premier League Tracker",
+  },
 };
+
+export const viewport: Viewport = {
+  themeColor: "#0a0f1c",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 
 export default function RootLayout({
   children,

@@ -36,7 +36,7 @@ async function fplFetch<T>(endpoint: string, revalidate = 60): Promise<T> {
 export async function getBootstrapStatic() {
   'use cache'
   cacheTag('bootstrap', 'gameweek-data');
-  cacheLife('static');
+  cacheLife('gameweek');
 
   const url = `${FPL_API_BASE}/bootstrap-static/`;
   

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
 import { getManagerHistoryData } from '../../../../Fpl/Services/AnalyticsEngine';
 import { ManagerHistoryContent } from './ManagerHistoryContent';
 import styles from './ManagerHistory.module.css';
@@ -35,6 +36,10 @@ const ManagerHistorySkeleton = () => {
 };
 
 const ManagerHistoryInner = async ({ leagueId, managerId }: Props) => {
+  'use cache'
+  cacheTag('manager-history', `manager-${managerId}`);
+  cacheLife('gameweek' as any);
+
   const historyData = await getManagerHistoryData(managerId, leagueId);
 
   if (!historyData) {

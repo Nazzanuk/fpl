@@ -1,0 +1,28 @@
+{
+  "name": "FPL Alchemy - Live Fantasy Premier League Tracker",
+  "short_name": "FPL Alchemy",
+  "description": "Track your FPL mini-league in real time. Live scores, projected bonus points, auto-subs, and captain performance.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f8fa",
+  "theme_color": "#0a0f1c",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

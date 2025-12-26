@@ -150,6 +150,26 @@
   backdrop-filter: blur(8px);
   border: 1px solid rgba(212, 175, 55, 0.3);
   box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chipBadge {
+  background: var(--negative);
+  color: white;
+  font-size: 0.5rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 2px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
 }
 
 .recSection {

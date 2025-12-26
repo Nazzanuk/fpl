@@ -1,4 +1,6 @@
 import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
+import { getGameweekStatus } from '../../../../Fpl/Utils/GameweekStatus';
 import { buildLiveTable } from '../../../../Fpl/Services/FPLEngine';
 import { StandingsListServer } from './StandingsListServer';
 import styles from './StandingsList.module.css';
@@ -37,9 +39,15 @@ const StandingsAsyncSkeleton = () => (
 );
 
 const StandingsAsyncInner = async ({ params, searchParams, viewOverride }: PageProps) => {
+  'use cache'
   const { id } = await params;
   const { manager, view } = await searchParams;
   
+  cacheTag('standings', `league-${id}`);
+  
+  const { isLive } = await getGameweekStatus();
+  cacheLife(isLive ? 'live' : 'gameweek' as any);
+
   const leagueId = parseInt(id, 10);
   const selectedManagerId = manager ? parseInt(manager, 10) : undefined;
   

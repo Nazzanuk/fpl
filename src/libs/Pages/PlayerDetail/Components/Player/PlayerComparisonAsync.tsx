@@ -1,5 +1,6 @@
 
 import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
 import { getPlayerStatsAggregate } from '../../../../Fpl/Services/FPLEngine';
 import { PlayerComparisonTable } from './PlayerComparisonTable';
 import styles from './PlayerComparisonTable.module.css';
@@ -35,10 +36,14 @@ const PlayerComparisonAsyncSkeleton = () => {
 };
 
 const PlayerComparisonAsyncInner = async ({ searchParams }: Props) => {
+  'use cache'
   const { page } = await searchParams;
   const currentPage = page ? parseInt(page, 10) : 1;
   const pageSize = 20;
   const offset = (currentPage - 1) * pageSize;
+
+  cacheTag('player-stats', `page-${currentPage}`);
+  cacheLife('gameweek' as any);
 
   const { players, totalCount } = await getPlayerStatsAggregate(undefined, pageSize, offset);
 

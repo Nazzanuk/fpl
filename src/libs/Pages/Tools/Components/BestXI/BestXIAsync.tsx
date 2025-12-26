@@ -1,5 +1,6 @@
 
 import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
 import { getBestXI, getTransferRecommendations, getPlayerStatsAggregate } from '../../../../Fpl/Services/FPLEngine';
 import { getManagerPicks } from '../../../../Fpl/Data/Client/FPLApiClient';
 import { getBootstrapStatic } from '../../../../Fpl/Data/Client/FPLApiClient';
@@ -38,9 +39,16 @@ const BestXIAsyncSkeleton = () => {
 };
 
 const BestXIAsyncInner = async ({ leagueId, managerId }: Props) => {
+  'use cache'
+  cacheTag('best-xi', leagueId ? `league-${leagueId}` : 'all');
+  cacheLife('gameweek');
+
   // 1. Fetch Bootstrap for current GW info
   const bootstrap = await getBootstrapStatic();
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current)?.id || 1;
+  const currentGw = bootstrap.events.find((e: any) => e.is_current);
+  
+  // Use current GW for picks - next GW picks don't exist until deadline passes
+  const eventForPicks = currentGw?.id || 1;
 
   // 2. Calculate Best XI
   const bestXI = leagueId ? await getBestXI(leagueId) : { formation: '4-4-2', players: [], starting11: [], totalPoints: 0, totalValue: 0, totalCost: 0, totalTrimean: 0 };
@@ -51,8 +59,7 @@ const BestXIAsyncInner = async ({ leagueId, managerId }: Props) => {
 
   if (managerId) {
     try {
-      const team = await getManagerPicks(managerId, currentEvent);
-      const bank = team.entry_history?.bank || 0;
+      const team = await getManagerPicks(managerId, eventForPicks);
 
       recommendations = await getTransferRecommendations(managerId);
 
@@ -71,7 +78,8 @@ const BestXIAsyncInner = async ({ leagueId, managerId }: Props) => {
         }),
         bench: [],
         totalTrimean: managerPlayers.reduce((sum, p) => sum + p.trimean, 0),
-        totalCost: managerPlayers.reduce((sum, p) => sum + p.cost, 0)
+        totalCost: managerPlayers.reduce((sum, p) => sum + p.cost, 0),
+        activeChip: team.active_chip
       };
 
     } catch (e) {

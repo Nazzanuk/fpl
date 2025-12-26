@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
 import { getLeagueTrends } from '../../../../Fpl/Services/AnalyticsEngine';
 import { LeagueTrendsContent } from './LeagueTrendsContent';
 import styles from './LeagueTrends.module.css';
@@ -29,6 +30,10 @@ const LeagueTrendsSkeleton = () => {
 };
 
 const LeagueTrendsInner = async ({ leagueId }: Props) => {
+  'use cache'
+  cacheTag('league-trends', `league-${leagueId}`);
+  cacheLife('gameweek' as any);
+
   const trends = await getLeagueTrends(leagueId);
 
   return <LeagueTrendsContent trends={trends} />;
