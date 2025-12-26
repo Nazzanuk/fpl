@@ -27,13 +27,7 @@ export const BestXIView = ({ bestXI, recommendations, managerTeam }: Props) => {
     return { gkp, def, mid, fwd };
   };
 
-  // Helper to get FDR color class based on difficulty
-  const getFDRClass = (fdr: number): string => {
-    if (fdr <= 2) return styles.fdrEasy;
-    if (fdr <= 3) return styles.fdrMedium;
-    if (fdr <= 4) return styles.fdrHard;
-    return styles.fdrVeryHard;
-  };
+
 
   const { gkp, def, mid, fwd } = getPitchRows(currentTeam.starting11);
 
@@ -61,7 +55,7 @@ export const BestXIView = ({ bestXI, recommendations, managerTeam }: Props) => {
 
         <div className={styles.statsRow}>
           <div className={styles.statGroup}>
-             <div className={styles.statLabel}>Total Trimean</div>
+             <div className={styles.statLabel}>Total Secret Sauce</div>
              <div className={styles.statValue}>{currentTeam.totalTrimean.toFixed(2)}</div>
              {viewMode === 'manager' && (
                <div className={styles.statDiff}>
@@ -106,48 +100,49 @@ export const BestXIView = ({ bestXI, recommendations, managerTeam }: Props) => {
         </div>
 
         <div className={styles.recSection}>
-          <h3 className={styles.sectionTitle}>Transfer Recommendations</h3>
+          <div className={styles.recHeader}>
+            <span className={styles.recHeaderTitle}>Recommended Transfers</span>
+            <span className={styles.recHeaderCount}>{recommendations.length}</span>
+          </div>
           {recommendations.length === 0 ? (
             <div className={styles.empty}>No clear upgrades found within budget.</div>
           ) : (
-            <div className={styles.recList}>
+            <div className={styles.recTable}>
+              <div className={styles.recTableHeader}>
+                <span className={styles.colRank}>#</span>
+                <span className={styles.colOut}>Out</span>
+                <span className={styles.colArrow}></span>
+                <span className={styles.colIn}>In</span>
+                <span className={styles.colGain}>SS</span>
+                <span className={styles.colCost}>Cost</span>
+                <span className={styles.colFdr}>FDR</span>
+              </div>
               {recommendations.map((rec, i) => (
-                <div key={i} className={styles.recCard}>
-                  <div className={styles.recHeader}>
-                    <div className={styles.recRank}>#{i + 1}</div>
-                    <div className={styles.recStats}>
-                      <span className={styles.gain}>+{rec.trimeanDiff.toFixed(2)} Trimean</span>
-                      <span className={rec.costDiff <= 0 ? styles.positiveCost : styles.negativeCost}>
-                        {rec.costDiff <= 0 ? `saves £${Math.abs(rec.costDiff).toFixed(1)}m` : `costs £${rec.costDiff.toFixed(1)}m`}
-                      </span>
-                    </div>
-                  </div>
-                  <div className={styles.recBody}>
-                    <div className={styles.playerOut}>
-                      <span className={styles.label}>OUT</span>
-                      <span className={styles.name}>{rec.playerOut.webName}</span>
-                      <div className={styles.playerMeta}>
-                        <span className={styles.trimeanValue}>{rec.playerOut.trimean.toFixed(2)}</span>
-                        <span className={styles.fdrLabel}>FDR: <span className={getFDRClass(rec.playerOutFDR)}>{rec.playerOutFDR.toFixed(1)}</span></span>
-                      </div>
-                    </div>
-                    <div className={styles.arrow}>→</div>
-                    <div className={styles.playerIn}>
-                      <span className={styles.label}>IN</span>
-                      <span className={styles.name}>{rec.playerIn.webName}</span>
-                      <div className={styles.playerMeta}>
-                        <span className={styles.trimeanValue}>{rec.playerIn.trimean.toFixed(2)}</span>
-                        <span className={styles.fdrLabel}>FDR: <span className={getFDRClass(rec.playerInFDR)}>{rec.playerInFDR.toFixed(1)}</span></span>
-                      </div>
-                    </div>
-                  </div>
-                  {rec.fixtureDifficultyImpact !== 0 && (
-                    <div className={styles.recFixtures}>
-                      <span className={rec.fixtureDifficultyImpact > 0 ? styles.fixtureGood : styles.fixtureBad}>
-                        Fixtures: {rec.fixtureDifficultyImpact > 0 ? 'Easier' : 'Harder'} ({Math.abs(rec.fixtureDifficultyImpact).toFixed(1)})
-                      </span>
-                    </div>
-                  )}
+                <div 
+                  key={i} 
+                  className={`${styles.recRow} ${rec.costDiff <= 0 ? styles.recRowValue : ''}`}
+                >
+                  <span className={styles.colRank}>{i + 1}</span>
+                  <span className={styles.colOut}>
+                    <span className={styles.playerName}>{rec.playerOut.webName}</span>
+                    <span className={styles.playerSS}>{rec.playerOut.trimean.toFixed(1)}</span>
+                  </span>
+                  <span className={styles.colArrow}>→</span>
+                  <span className={styles.colIn}>
+                    <span className={styles.playerName}>{rec.playerIn.webName}</span>
+                    <span className={styles.playerSS}>{rec.playerIn.trimean.toFixed(1)}</span>
+                  </span>
+                  <span className={`${styles.colGain} ${styles.positive}`}>
+                    +{rec.trimeanDiff.toFixed(2)}
+                  </span>
+                  <span className={`${styles.colCost} ${rec.costDiff <= 0 ? styles.positive : styles.muted}`}>
+                    {rec.costDiff <= 0 
+                      ? (rec.costDiff === 0 ? 'FREE' : `+£${Math.abs(rec.costDiff).toFixed(1)}m`)
+                      : `-£${rec.costDiff.toFixed(1)}m`}
+                  </span>
+                  <span className={`${styles.colFdr} ${rec.fixtureDifficultyImpact > 0 ? styles.fdrEasy : rec.fixtureDifficultyImpact < 0 ? styles.fdrHard : ''}`}>
+                    {rec.fixtureDifficultyImpact > 0 ? '▼' : rec.fixtureDifficultyImpact < 0 ? '▲' : '–'}
+                  </span>
                 </div>
               ))}
             </div>

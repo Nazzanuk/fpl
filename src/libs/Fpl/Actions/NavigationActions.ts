@@ -14,6 +14,7 @@ const LeagueNavigationSchema = z.object({
 
 // Server action to navigate to league with specific view
 export async function navigateToLeagueView(formData: FormData) {
+  let url = '';
   try {
     const leagueId = formData.get('leagueId') as string;
     const view = formData.get('view') as string;
@@ -25,7 +26,7 @@ export async function navigateToLeagueView(formData: FormData) {
       managerId: managerId || undefined,
     });
     
-    let url = `/league/${validated.leagueId}`;
+    url = `/league/${validated.leagueId}`;
     
     if (validated.view && validated.view !== 'standings') {
       url += `/${validated.view}`;
@@ -36,20 +37,25 @@ export async function navigateToLeagueView(formData: FormData) {
       url += `?manager=${validated.managerId}`;
     }
     
-    redirect(url);
   } catch (error) {
     console.error('Navigation failed:', error);
     // Fallback to basic league page
     const leagueId = formData.get('leagueId') as string;
     if (leagueId && /^\d+$/.test(leagueId)) {
-      redirect(`/league/${leagueId}`);
+      url = `/league/${leagueId}`;
+    } else {
+      throw new Error('Invalid navigation parameters');
     }
-    throw new Error('Invalid navigation parameters');
+  }
+
+  if (url) {
+    redirect(url);
   }
 }
 
 // Server action to navigate to manager detail
 export async function navigateToManagerDetail(formData: FormData) {
+  let url = '';
   try {
     const leagueId = formData.get('leagueId') as string;
     const managerId = formData.get('managerId') as string;
@@ -60,21 +66,25 @@ export async function navigateToManagerDetail(formData: FormData) {
       managerId,
     });
     
-    let url = `/league/${validated.leagueId}/manager/${validated.managerId}`;
+    url = `/league/${validated.leagueId}/manager/${validated.managerId}`;
     
     if (section === 'history' || section === 'transfers') {
       url += `/${section}`;
     }
     
-    redirect(url);
   } catch (error) {
     console.error('Manager navigation failed:', error);
     throw new Error('Invalid manager navigation parameters');
+  }
+
+  if (url) {
+    redirect(url);
   }
 }
 
 // Server action to navigate to player detail
 export async function navigateToPlayerDetail(formData: FormData) {
+  let url = '';
   try {
     const leagueId = formData.get('leagueId') as string;
     const playerId = formData.get('playerId') as string;
@@ -84,15 +94,20 @@ export async function navigateToPlayerDetail(formData: FormData) {
       playerId,
     });
     
-    redirect(`/league/${validated.leagueId}/player/${validated.playerId}`);
+    url = `/league/${validated.leagueId}/player/${validated.playerId}`;
   } catch (error) {
     console.error('Player navigation failed:', error);
     throw new Error('Invalid player navigation parameters');
+  }
+
+  if (url) {
+    redirect(url);
   }
 }
 
 // Server action to navigate to tools
 export async function navigateToTool(formData: FormData) {
+  let url = '';
   try {
     const leagueId = formData.get('leagueId') as string;
     const tool = formData.get('tool') as string;
@@ -107,18 +122,22 @@ export async function navigateToTool(formData: FormData) {
       throw new Error('Invalid tool');
     }
     
-    redirect(`/league/${leagueId}/tools/${tool}`);
+    url = `/league/${leagueId}/tools/${tool}`;
   } catch (error) {
     console.error('Tool navigation failed:', error);
     throw new Error('Invalid tool navigation parameters');
+  }
+
+  if (url) {
+    redirect(url);
   }
 }
 
 // Server action for league search/entry
 export async function navigateToLeague(formData: FormData) {
+  const leagueId = formData.get('leagueId') as string;
+
   try {
-    const leagueId = formData.get('leagueId') as string;
-    
     if (!leagueId || !/^\d+$/.test(leagueId)) {
       throw new Error('Please enter a valid league ID');
     }
@@ -126,9 +145,12 @@ export async function navigateToLeague(formData: FormData) {
     // Revalidate the league data when navigating
     revalidatePath(`/league/${leagueId}`);
     
-    redirect(`/league/${leagueId}`);
   } catch (error) {
     console.error('League navigation failed:', error);
     throw new Error('Please enter a valid league ID');
+  }
+
+  if (leagueId) {
+    redirect(`/league/${leagueId}`);
   }
 }

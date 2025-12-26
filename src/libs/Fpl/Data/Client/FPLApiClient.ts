@@ -33,9 +33,27 @@ async function fplFetch<T>(endpoint: string, revalidate = 60): Promise<T> {
 
 /**
  * Bootstrap-static data (player/team metadata, current gameweek)
+ * Note: This endpoint returns ~2.4MB which exceeds Next.js 2MB cache limit.
+ * We use cache: 'no-store' to bypass the problematic internal cache.
  */
 export async function getBootstrapStatic() {
-  return fplFetch<any>('/bootstrap-static/');
+  const url = `${FPL_API_BASE}/bootstrap-static/`;
+  
+  try {
+    const response = await fetch(url, {
+      headers: { 'User-Agent': USER_AGENT },
+      cache: 'no-store', // Bypass Next.js cache for large responses
+    });
+
+    if (!response.ok) {
+      throw new Error(`FPL API error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Failed to fetch bootstrap-static:', error);
+    throw error;
+  }
 }
 
 /**

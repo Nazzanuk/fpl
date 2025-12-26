@@ -27,7 +27,7 @@ export const ManagerRow = ({ score, rank, leagueId }: Props) => {
       <td className={clsx(styles.cell, styles.points)}>
         {score.liveTotalPoints}
       </td>
-      <td className={clsx(styles.cell, styles.points, styles.trimean)}>
+      <td className={clsx(styles.cell, styles.points, styles.trimean)} title="Secret Sauce">
         {score.teamTrimean?.toFixed(2) || '0.00'}
       </td>
     </tr>

@@ -16,47 +16,7 @@ import { getPlayerStatsAggregate } from './AnalyticsEngine';
 
 const limit = pLimit(5); // Concurrency control - max 5 concurrent requests
 
-/**
- * Calculate quartiles from an array of numbers
- */
-function calculateQuartiles(values: number[]): { q1: number; q2: number; q3: number } {
-  if (values.length === 0) {
-    return { q1: 0, q2: 0, q3: 0 };
-  }
-
-  const sorted = [...values].sort((a, b) => a - b);
-  const n = sorted.length;
-
-  // Calculate median (Q2)
-  const q2 = n % 2 === 0
-    ? (sorted[n / 2 - 1] + sorted[n / 2]) / 2
-    : sorted[Math.floor(n / 2)];
-
-  // Calculate Q1 (median of lower half)
-  const lowerHalf = sorted.slice(0, Math.floor(n / 2));
-  const q1 = lowerHalf.length % 2 === 0
-    ? (lowerHalf[lowerHalf.length / 2 - 1] + lowerHalf[lowerHalf.length / 2]) / 2
-    : lowerHalf[Math.floor(lowerHalf.length / 2)];
-
-  // Calculate Q3 (median of upper half)
-  const upperHalf = n % 2 === 0
-    ? sorted.slice(n / 2)
-    : sorted.slice(Math.floor(n / 2) + 1);
-  const q3 = upperHalf.length % 2 === 0
-    ? (upperHalf[upperHalf.length / 2 - 1] + upperHalf[upperHalf.length / 2]) / 2
-    : upperHalf[Math.floor(upperHalf.length / 2)];
-
-  return { q1, q2, q3 };
-}
-
-/**
- * Calculate Tukey's Trimean: (Q1 + 2*Q2 + Q3) / 4
- */
-function calculateTrimean(values: number[]): number {
-  if (values.length === 0) return 0;
-  const { q1, q2, q3 } = calculateQuartiles(values);
-  return (q1 + 2 * q2 + q3) / 4;
-}
+import { calculateTrimean } from '../Utils/MathUtils';
 
 /**
  * Fetch trimean for multiple players in parallel
@@ -69,12 +29,17 @@ async function fetchPlayersTrimean(playerIds: number[]): Promise<Map<number, num
     playerIds.map(id => limit(async () => {
       try {
         const summary = await getElementSummary(id);
-        // Only include gameweeks where the player actually played (minutes > 0)
-        const gameweekPoints = summary.history
-          .filter((gw: any) => gw.minutes > 0)
-          .map((gw: any) => gw.total_points);
+        // Match "Secret Sauce" logic from AnalyticsEngine
+        const validHistory = (summary.history || []).filter((gw: any) => gw.minutes > 0);
+        const recentHistory = validHistory.slice(-12);
+        
+        const weightedHistory = recentHistory.map((gw: any) => {
+          const difficulty = gw.difficulty || 3;
+          const multiplier = 1 + (difficulty - 3) * 0.1;
+          return gw.total_points * multiplier;
+        });
 
-        const trimean = calculateTrimean(gameweekPoints);
+        const trimean = calculateTrimean(weightedHistory);
         return { id, trimean };
       } catch (error) {
         console.error(`Failed to fetch summary for player ${id}:`, error);
@@ -83,8 +48,8 @@ async function fetchPlayersTrimean(playerIds: number[]): Promise<Map<number, num
     }))
   );
 
-  summaries.forEach(({ id, trimean }) => {
-    trimeanMap.set(id, trimean);
+  summaries.forEach((res: any) => {
+    if (res) trimeanMap.set(res.id, res.trimean);
   });
 
   return trimeanMap;
@@ -576,7 +541,7 @@ export async function getBestXI(leagueId: number) {
   
   const topPpgIds = bootstrap.elements
     .filter((el: any) => el.minutes > 90)
-    .sort((a: any, b: any) => parseFloat(b.points_per_game) - parseFloat(a.points_per_game))
+    .sort((a: any, b: any) => parseFloat(b.form) - parseFloat(a.form))
     .slice(0, 100)
     .map((el: any) => el.id);
 
@@ -699,15 +664,16 @@ export async function getTransferRecommendations(managerId: number) {
   // 2. Fetch all required player stats (Manager's team + Potential upgrades)
   const managerPlayerIds = currentPicks.picks.map((p: any) => p.element);
   
-  // Heuristic for potential upgrades: top 100 players by trimean/points
-  // We'll use the aggregate service which is cached
-  const topPlayers = await getPlayerStatsAggregate(); // Fetch default top 100
+  // Heuristic for potential upgrades: top players by current form
+  const topPlayers = await getPlayerStatsAggregate(); 
   const managerPlayers = await getPlayerStatsAggregate(managerPlayerIds);
   
-  // All candidates for evaluation
-  const allCandidates = [...topPlayers, ...managerPlayers].filter((p, i, self) => 
-    p && p.status === 'a' && self.findIndex(s => s?.id === p.id) === i
-  ) as any[];
+  console.log(`[RECS] Analyzing manager ${managerId}. Squad: ${managerPlayers.length} players. Pool: ${topPlayers.length} candidates.`);
+  
+  // All candidates for evaluation (deduplicated)
+  const allCandidates = Array.from(
+    new Map([...topPlayers, ...managerPlayers].filter(Boolean).map(p => [p.id, p])).values()
+  ).filter((p: any) => p.status === 'a');
 
   const managerSquad = managerPlayers.filter(Boolean);
   const bankBalance = (currentPicks.entry_history?.bank || 0) / 10;
@@ -738,11 +704,26 @@ export async function getTransferRecommendations(managerId: number) {
 
   for (const current of managerSquad) {
     const outFDR = getAvgFDR(bootstrap.elements.find((e: any) => e.id === current.id)?.team || 0);
+
+    // Get the actual selling price for this player
+    // Note: FPL API picks usually have 'selling_price'
+    const currentPick = currentPicks.picks?.find((p: any) => p.element === current.id);
+    const sellingPrice = currentPick?.selling_price || (current.cost * 10);
     
+    // Bank is in raw FPL units (e.g. 5 means £0.5m)
+    const bankRaw = currentPicks.entry_history?.bank || 0;
+    const totalBudget = bankRaw + (sellingPrice || 0);
+    
+    console.log(`[RECS] ${current.webName}: trimean=${current.trimean.toFixed(2)}, price=${sellingPrice}, budget=${totalBudget}`);
+    
+    // Filter alternatives that fit in budget
+    // RELAXED: allow up to £50.0m over budget as requested (effectively budget blind)
     const alternatives = allCandidates.filter(alt => 
       alt.position === current.position && 
       alt.id !== current.id &&
-      alt.cost <= current.cost + bankBalance
+      !managerPlayerIds.includes(alt.id) && // EXCLUDE players already in the team
+      (alt.trimean > current.trimean) &&   // Basic quality filter
+      (alt.cost * 10) <= (totalBudget + 500)
     );
 
     for (const alt of alternatives) {
@@ -751,31 +732,35 @@ export async function getTransferRecommendations(managerId: number) {
       const trimeanDiff = alt.trimean - current.trimean;
       
       // Effectiveness score: weighted trimean improvement + fixture bonus
-      const effectiveness = trimeanDiff + (fdrImpact * 0.75);
-
-      if (effectiveness > 0.1) { // Only suggest meaningful upgrades
+      const effectiveness = trimeanDiff + (fdrImpact * 0.5);
+      
+      // Threshold set to 0.1 to show ANY positive move.
+      if (effectiveness > 0.1) { 
+        console.log(`[RECS]   UPGRADE: ${alt.webName} (+${trimeanDiff.toFixed(2)}) score=${effectiveness.toFixed(2)}`);
         recommendations.push({
           playerOut: current,
           playerIn: alt,
           trimeanDiff,
-          costDiff: alt.cost - current.cost,
+          costDiff: alt.cost - (sellingPrice / 10),
           fixtureDifficultyImpact: fdrImpact,
           playerOutFDR: outFDR,
           playerInFDR: inFDR,
           effectivenessScore: effectiveness,
           priority: Math.round(effectiveness * 10),
-          reasoning: `${alt.webName} is performing better and has ${fdrImpact > 0 ? 'easier' : 'similar'} fixtures.`
+          reasoning: `${alt.webName} is outperforming (Secret Sauce +${trimeanDiff.toFixed(2)}) with ${fdrImpact > 0 ? 'easier' : 'similar'} fixtures.`
         });
       }
     }
   }
 
-  // 5. Finalize top 5 (Greeedy selection to respect budget and avoid overlap)
-  return recommendations
+  // 5. Finalize top 12 (Greedy selection to respect budget and avoid overlap)
+  const filtered = recommendations
     .sort((a, b) => b.effectivenessScore - a.effectivenessScore)
     .filter((rec, i, self) => 
       self.findIndex(s => s.playerIn.id === rec.playerIn.id) === i &&
       self.findIndex(s => s.playerOut.id === rec.playerOut.id) === i
-    )
-    .slice(0, 5);
+    );
+    
+  console.log(`[RECS] Found ${recommendations.length} candidate moves, ${filtered.length} unique moves. Slicing to 12.`);
+  return filtered.slice(0, 12);
 }

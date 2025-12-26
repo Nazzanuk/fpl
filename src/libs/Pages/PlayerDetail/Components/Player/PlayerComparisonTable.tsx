@@ -125,7 +125,7 @@ export const PlayerComparisonTable = ({ players }: Props) => {
               <th onClick={() => handleSort('totalPoints')} className={styles.rightAlign}>Total {getSortIcon('totalPoints')}</th>
               <th onClick={() => handleSort('averagePoints')} className={styles.rightAlign}>Avg {getSortIcon('averagePoints')}</th>
               <th onClick={() => handleSort('medianPoints')} className={styles.rightAlign}>Median {getSortIcon('medianPoints')}</th>
-              <th onClick={() => handleSort('trimean')} className={styles.rightAlign}>Trimean {getSortIcon('trimean')}</th>
+              <th onClick={() => handleSort('trimean')} className={styles.rightAlign}>Secret Sauce {getSortIcon('trimean')}</th>
               <th onClick={() => handleSort('lastGwPoints')} className={styles.rightAlign}>Last GW {getSortIcon('lastGwPoints')}</th>
             </tr>
           </thead>

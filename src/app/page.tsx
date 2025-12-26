@@ -1,4 +1,4 @@
-import { navigateToLeague } from '../libs/Fpl/Actions/NavigationActions';
+import { LeagueForm } from '../libs/Shared/Components/LeagueForm/LeagueForm';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -23,23 +23,7 @@ export default function Home() {
             See exactly who&apos;s winning your league right now.
           </p>
 
-          <form action={navigateToLeague} className={styles.form}>
-            <div className={styles.inputGroup}>
-              <input
-                type="number"
-                name="leagueId"
-                placeholder="Enter your league ID"
-                className={styles.input}
-                required
-              />
-              <button type="submit" className={styles.button}>
-                Track
-              </button>
-            </div>
-            <p className={styles.hint}>
-              Find your league ID in the URL when viewing your league on the FPL website
-            </p>
-          </form>
+          <LeagueForm />
         </div>
 
         <div className={styles.features}>

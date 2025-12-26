@@ -14,59 +14,9 @@ import pLimit from 'p-limit';
 
 const limit = pLimit(5);
 
-/**
- * Calculate quartiles from an array of numbers
- */
-function calculateQuartiles(values: number[]): { q1: number; q2: number; q3: number } {
-  if (values.length === 0) {
-    return { q1: 0, q2: 0, q3: 0 };
-  }
+import { calculateTrimean, calculateMedian } from '../Utils/MathUtils';
 
-  const sorted = [...values].sort((a, b) => a - b);
-  const n = sorted.length;
 
-  // Calculate median (Q2)
-  const q2 = n % 2 === 0
-    ? (sorted[n / 2 - 1] + sorted[n / 2]) / 2
-    : sorted[Math.floor(n / 2)];
-
-  // Calculate Q1 (median of lower half)
-  const lowerHalf = sorted.slice(0, Math.floor(n / 2));
-  const q1 = lowerHalf.length % 2 === 0
-    ? (lowerHalf[lowerHalf.length / 2 - 1] + lowerHalf[lowerHalf.length / 2]) / 2
-    : lowerHalf[Math.floor(lowerHalf.length / 2)];
-
-  // Calculate Q3 (median of upper half)
-  const upperHalf = n % 2 === 0
-    ? sorted.slice(n / 2)
-    : sorted.slice(Math.floor(n / 2) + 1);
-  const q3 = upperHalf.length % 2 === 0
-    ? (upperHalf[upperHalf.length / 2 - 1] + upperHalf[upperHalf.length / 2]) / 2
-    : upperHalf[Math.floor(upperHalf.length / 2)];
-
-  return { q1, q2, q3 };
-}
-
-/**
- * Calculate Tukey's Trimean: (Q1 + 2*Q2 + Q3) / 4
- */
-function calculateTrimean(values: number[]): number {
-  if (values.length === 0) return 0;
-  const { q1, q2, q3 } = calculateQuartiles(values);
-  return (q1 + 2 * q2 + q3) / 4;
-}
-
-/**
- * Calculate median from an array of numbers
- */
-function calculateMedian(values: number[]): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const n = sorted.length;
-  return n % 2 === 0
-    ? (sorted[n / 2 - 1] + sorted[n / 2]) / 2
-    : sorted[Math.floor(n / 2)];
-}
 
 /**
  * Get league trends and analytics
@@ -187,10 +137,10 @@ const playerStatsCache = new Map<number, { median: number; trimean: number }>();
 export async function getPlayerStatsAggregate(elementIds?: number[]) {
   const bootstrap = await getBootstrapStatic();
 
-  // If no elementIds provided, return top 100 players by total points for a better initial view
+  // If no elementIds provided, return top 400 players by total points
   const idsToProcess = elementIds || bootstrap.elements
     .sort((a: any, b: any) => b.total_points - a.total_points)
-    .slice(0, 100)
+    .slice(0, 500)
     .map((el: any) => el.id);
 
   // Identify which IDs are already in cache
@@ -203,13 +153,30 @@ export async function getPlayerStatsAggregate(elementIds?: number[]) {
         try {
           const summary = await getElementSummary(id);
           // Only include gameweeks where the player actually played (minutes > 0)
-          const gameweekPoints = summary.history
-            .filter((gw: any) => gw.minutes > 0)
-            .map((gw: any) => gw.total_points);
+          // AND only the last 8 gameweeks to prevent stale data bias
+          const validHistory = summary.history
+            .filter((gw: any) => gw.minutes > 0);
+            
+          const recentHistory = validHistory.slice(-12); // Last 12 appearances
           
+          // Context Blindness Fix: Weight points by opponent difficulty
+          // Points against strong opponents (High difficulty) are worth more
+          // Points against weak opponents (Low difficulty) are worth less
+          const weightedGameweekPoints = recentHistory.map((gw: any) => {
+             // Difficulty is usuall 1-5. 
+             // We want to reward performance in hard games.
+             // Standardize: 3 is neutral.
+             // Factor: 1 + (Difficulty - 3) * 0.1
+             // Difficulty 5 (Man City) -> 1.2 multiplier
+             // Difficulty 1 (Easy) -> 0.8 multiplier
+             const difficulty = gw.difficulty || 3; 
+             const multiplier = 1 + (difficulty - 3) * 0.1;
+             return gw.total_points * multiplier;
+          });
+
           const stats = {
-            median: calculateMedian(gameweekPoints),
-            trimean: calculateTrimean(gameweekPoints),
+            median: calculateMedian(weightedGameweekPoints),
+            trimean: calculateTrimean(weightedGameweekPoints),
           };
           
           playerStatsCache.set(id, stats);
@@ -241,8 +208,8 @@ export async function getPlayerStatsAggregate(elementIds?: number[]) {
       cost: element.now_cost / 10,
       totalPoints: element.total_points,
       averagePoints: pointsPerGame,
-      medianPoints: stats?.median !== undefined ? stats.median : pointsPerGame,
-      trimean: stats?.trimean !== undefined ? stats.trimean : pointsPerGame,
+      medianPoints: (stats?.median !== undefined && !Number.isNaN(stats.median)) ? stats.median : pointsPerGame,
+      trimean: (stats?.trimean !== undefined && !Number.isNaN(stats.trimean)) ? stats.trimean : pointsPerGame,
       lastGwPoints: element.event_points || 0,
       matchesPlayed: element.minutes > 0 ? Math.floor(element.minutes / 90) : 0,
       injuryStatus: element.news || null,
