@@ -1,4 +1,4 @@
-import { getBootstrapStatic } from '../Data/Client/FPLApiClient';
+import { getBootstrapEvents } from '../Data/Client/BootstrapClient';
 import { cacheLife, cacheTag } from 'next/cache';
 
 export type GameweekStatus = 'live' | 'active' | 'finished' | 'preseason';
@@ -16,10 +16,10 @@ export async function getGameweekStatus(): Promise<GameweekInfo> {
   'use cache'
   cacheTag('gw-status');
   cacheLife('live'); // Check frequently (30s revalidate)
-  
+
   try {
-    const bootstrap = await getBootstrapStatic();
-    const currentEvent = bootstrap.events.find((e: any) => e.is_current);
+    const events = await getBootstrapEvents();
+    const currentEvent = events.find((e: any) => e.is_current);
     
     if (!currentEvent) {
       return { status: 'preseason', currentGw: 0, isLive: false };

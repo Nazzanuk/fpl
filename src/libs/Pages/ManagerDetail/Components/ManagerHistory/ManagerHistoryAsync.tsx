@@ -5,8 +5,9 @@ import { ManagerHistoryContent } from './ManagerHistoryContent';
 import styles from './ManagerHistory.module.css';
 
 type Props = {
-  leagueId: number;
-  managerId: number;
+  leagueId?: number;
+  managerId?: number;
+  params?: Promise<{ id: string; managerId: string }>;
 };
 
 export const ManagerHistoryAsync = (props: Props) => {
@@ -35,8 +36,21 @@ const ManagerHistorySkeleton = () => {
   );
 };
 
-const ManagerHistoryInner = async ({ leagueId, managerId }: Props) => {
-  'use cache'
+const ManagerHistoryInner = async ({ leagueId: propsLeagueId, managerId: propsManagerId, params }: Props) => {
+  'use cache';
+  let leagueId = propsLeagueId;
+  let managerId = propsManagerId;
+
+  if (params) {
+    const resolved = await params;
+    leagueId = parseInt(resolved.id, 10);
+    managerId = parseInt(resolved.managerId, 10);
+  }
+
+  if (!managerId || !leagueId) {
+    return <div className={styles.error}>Manager or League not specified</div>;
+  }
+
   cacheTag('manager-history', `manager-${managerId}`);
   cacheLife('gameweek' as any);
 

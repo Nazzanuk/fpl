@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import type { PlayerStatSummary } from '../../../../Fpl/Types';
+import { EntityLink } from '../../../../Shared/Components/EntityLink/EntityLink';
 import styles from './PlayerComparisonTable.module.css';
 
 type SortField = 'totalPoints' | 'medianPoints' | 'averagePoints' | 'cost' | 'lastGwPoints' | 'webName' | 'matchesPlayed' | 'trimean';
@@ -123,10 +124,21 @@ export const PlayerComparisonTable = ({ players, totalCount, currentPage, pageSi
             {sortedPlayers.map(player => (
               <tr key={player.id} className={player.status !== 'a' ? styles.unavailable : ''}>
                 <td className={styles.playerName}>
-                  {player.webName}
+                  <EntityLink
+                    type="player"
+                    id={player.id}
+                    label={player.webName}
+                  />
                   {player.injuryStatus && <span className={styles.newsBadge} title={player.injuryStatus}>!</span>}
                 </td>
-                <td className={styles.teamName}>{player.teamShortName}</td>
+                <td className={styles.teamName}>
+                  <EntityLink
+                    type="team"
+                    id={player.teamId}
+                    label={player.teamShortName}
+                    variant="inline"
+                  />
+                </td>
                 <td className={styles.position}>{player.position}</td>
                 <td className={styles.rightAlign}>£{player.cost.toFixed(1)}</td>
                 <td className={styles.rightAlign}>{player.matchesPlayed}</td>

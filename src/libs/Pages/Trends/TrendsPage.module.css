@@ -1,0 +1,294 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface);
+  height: 100%;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+/* Stats Bar */
+.statsBar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+}
+
+.statLabel {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.statValue {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--text);
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.chartToggle {
+  display: flex;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.toggleBtn {
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: none;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toggleBtn[data-active="true"] {
+  background: var(--ink);
+  color: white;
+}
+
+.toggleBtn:hover:not([data-active="true"]) {
+  background: var(--surface-dim);
+}
+
+/* Chart Section */
+.chartSection {
+  flex: 1;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  background: var(--surface-dim);
+}
+
+.chartContainer {
+  position: relative;
+  flex: 1;
+  min-height: 250px;
+  padding: var(--space-2) var(--space-3) var(--space-2) 40px;
+}
+
+.yAxis {
+  position: absolute;
+  left: 0;
+  top: var(--space-2);
+  bottom: var(--space-2);
+  width: 36px;
+  display: flex;
+  flex-direction: column;
+}
+
+.yLabel {
+  position: absolute;
+  right: 4px;
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transform: translateY(-50%);
+  font-feature-settings: "tnum";
+}
+
+.chart {
+  width: 100%;
+  height: 100%;
+}
+
+.trendLine {
+  transition: opacity 0.15s ease;
+}
+
+.chart:hover .trendLine {
+  opacity: 0.4;
+}
+
+.chart:hover .trendLine:hover {
+  opacity: 1;
+  stroke-width: 4;
+}
+
+.xAxis {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3) var(--space-2) 40px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.xLabel {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-feature-settings: "tnum";
+}
+
+/* Legend Section */
+.legendSection {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  max-height: 140px;
+}
+
+.legendHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--ink);
+}
+
+.legendTitle {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: white;
+}
+
+.legendHint {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: var(--surface-dim);
+  overflow-y: auto;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.legendItem[data-selected="false"] {
+  opacity: 0.4;
+}
+
+.legendItem:hover {
+  border-color: var(--gold);
+}
+
+.legendColor {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+.legendName {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+.legendStats {
+  display: flex;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.legendRank {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  color: var(--gold-dark);
+}
+
+.legendPoints {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-feature-settings: "tnum";
+}
+
+/* Skeleton States */
+.skeletonTitle {
+  width: 150px;
+  height: 24px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonSubtitle {
+  width: 200px;
+  height: 14px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonChart {
+  flex: 1;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonLegend {
+  height: 80px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

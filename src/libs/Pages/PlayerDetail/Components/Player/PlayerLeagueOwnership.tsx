@@ -1,18 +1,14 @@
+import { EntityLink } from '../../../../Shared/Components/EntityLink/EntityLink';
 import type { PlayerDetail } from '../../../../Fpl/Types';
 import styles from './PlayerLeagueOwnership.module.css';
 
 type Props = {
   ownership: PlayerDetail['leagueOwnership'];
-  onSelectManager: (managerId: number) => void;
-  onClose: () => void;
+  onSelectManager?: (managerId: number) => void; // Deprecated
+  onClose?: () => void; // Deprecated
 };
 
-export const PlayerLeagueOwnership = ({ ownership, onSelectManager, onClose }: Props) => {
-  const handleSelectManager = (managerId: number) => {
-    onSelectManager(managerId);
-    onClose();
-  };
-
+export const PlayerLeagueOwnership = ({ ownership }: Props) => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -41,17 +37,17 @@ export const PlayerLeagueOwnership = ({ ownership, onSelectManager, onClose }: P
       ) : (
         <div className={styles.ownerList}>
           {ownership.owners.map(owner => (
-            <button
-              key={owner.managerId}
-              className={styles.owner}
-              onClick={() => handleSelectManager(owner.managerId)}
-            >
+            <div key={owner.managerId} className={styles.owner}>
               <div className={styles.ownerInfo}>
-                <span className={styles.ownerName}>{owner.managerName}</span>
+                <EntityLink
+                  type="manager"
+                  id={owner.managerId}
+                  label={owner.managerName}
+                  className={styles.ownerName}
+                />
                 {owner.isCaptain && <span className={styles.captainBadge}>C</span>}
               </div>
-              <span className={styles.viewLink}>View</span>
-            </button>
+            </div>
           ))}
         </div>
       )}

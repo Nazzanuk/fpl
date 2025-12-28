@@ -69,19 +69,14 @@
 
 .owner {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0.625rem;
-  background: var(--surface-muted);
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.1s ease;
-  width: 100%;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
 }
 
-.owner:hover {
-  background: var(--surface-dim);
+.owner:last-child {
+  border-bottom: none;
 }
 
 .ownerInfo {
@@ -91,8 +86,8 @@
 }
 
 .ownerName {
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 500;
   color: var(--text);
 }
 

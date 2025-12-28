@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { FixturesContent } from './FixturesContent';
-import { getBootstrapStatic, getAllFixtures } from '../../../../Fpl/Data/Client/FPLApiClient';
+import { getAllFixtures } from '../../../../Fpl/Data/Client/FPLApiClient';
+import { getBootstrapEvents, getBootstrapTeams } from '../../../../Fpl/Data/Client/BootstrapClient';
 import styles from './Fixtures.module.css';
 
 export const FixturesAsync = () => {
@@ -19,13 +20,14 @@ const FixturesSkeleton = () => (
 );
 
 const FixturesInner = async () => {
-  const [bootstrap, allFixtures] = await Promise.all([
-    getBootstrapStatic(),
+  const [bootstrapEvents, teams, allFixtures] = await Promise.all([
+    getBootstrapEvents(),
+    getBootstrapTeams(),
     getAllFixtures(),
   ]);
 
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current);
-  const nextEvent = bootstrap.events.find((e: any) => e.is_next);
+  const currentEvent = bootstrapEvents.find((e: any) => e.is_current);
+  const nextEvent = bootstrapEvents.find((e: any) => e.is_next);
   const currentGw = currentEvent?.id || nextEvent?.id || 1;
 
   // Get fixtures for current + next 5 gameweeks
@@ -34,8 +36,7 @@ const FixturesInner = async () => {
     (f: any) => f.event !== null && f.event >= currentGw && f.event <= endGw
   );
 
-  const teams = bootstrap.teams;
-  const events = bootstrap.events.filter((e: any) => e.id >= currentGw && e.id <= endGw);
+  const events = bootstrapEvents.filter((e: any) => e.id >= currentGw && e.id <= endGw);
 
   return (
     <FixturesContent

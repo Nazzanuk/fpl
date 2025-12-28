@@ -1,12 +1,17 @@
 import { Suspense } from 'react';
-import { getBootstrapStatic, getFixtures } from '../../../../Fpl/Data/Client/FPLApiClient';
+import { getFixtures } from '../../../../Fpl/Data/Client/FPLApiClient';
+import { getBootstrapEvents, getBootstrapTeams } from '../../../../Fpl/Data/Client/BootstrapClient';
 import { MatchTicker } from './MatchTicker';
 import styles from './MatchTicker.module.css';
 
-export const MatchTickerAsync = () => {
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export const MatchTickerAsync = ({ params }: Props) => {
   return (
     <Suspense fallback={<MatchTickerSkeleton />}>
-      <MatchTickerInner />
+      <MatchTickerInner params={params} />
     </Suspense>
   );
 };
@@ -28,16 +33,23 @@ const MatchTickerSkeleton = () => (
   </div>
 );
 
-const MatchTickerInner = async () => {
-  const bootstrap = await getBootstrapStatic();
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current);
+const MatchTickerInner = async ({ params }: Props) => {
+  const { id } = await params;
+  const leagueId = parseInt(id, 10);
+
+  const [events, teams] = await Promise.all([
+    getBootstrapEvents(),
+    getBootstrapTeams(),
+  ]);
+
+  const currentEvent = events.find((e: any) => e.is_current);
   const currentGw = currentEvent?.id || 38;
 
   const fixtures = await getFixtures(currentGw);
 
   const formattedFixtures = fixtures.map((f: any) => {
-    const homeTeam = bootstrap.teams.find((t: any) => t.id === f.team_h)?.short_name || 'UNK';
-    const awayTeam = bootstrap.teams.find((t: any) => t.id === f.team_a)?.short_name || 'UNK';
+    const homeTeam = teams.find((t: any) => t.id === f.team_h)?.short_name || 'UNK';
+    const awayTeam = teams.find((t: any) => t.id === f.team_a)?.short_name || 'UNK';
 
     let status: 'live' | 'finished' | 'upcoming' = 'upcoming';
     if (f.finished) status = 'finished';
@@ -55,5 +67,5 @@ const MatchTickerInner = async () => {
     };
   });
 
-  return <MatchTicker fixtures={formattedFixtures} />;
+  return <MatchTicker fixtures={formattedFixtures} leagueId={leagueId} />;
 };

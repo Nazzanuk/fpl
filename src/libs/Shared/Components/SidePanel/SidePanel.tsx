@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import { getAllFixtures, getBootstrapStatic } from '../../../Fpl/Data/Client/FPLApiClient';
+import { getAllFixtures } from '../../../Fpl/Data/Client/FPLApiClient';
+import { getBootstrapEvents, getBootstrapTeams } from '../../../Fpl/Data/Client/BootstrapClient';
 import type { Fixture } from '../../../Fpl/Types';
 import styles from './SidePanel.module.css';
 
@@ -15,8 +16,11 @@ export const SidePanel = () => {
 };
 
 const LiveMatchesInner = async () => {
-  const bootstrap = await getBootstrapStatic();
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current);
+  const [events, teams] = await Promise.all([
+    getBootstrapEvents(),
+    getBootstrapTeams(),
+  ]);
+  const currentEvent = events.find((e: any) => e.is_current);
   const currentGw = currentEvent ? currentEvent.id : 38;
   const allFixtures = await getAllFixtures();
   const fixtures = allFixtures.filter((f: any) => f.event === currentGw);
@@ -26,7 +30,7 @@ const LiveMatchesInner = async () => {
   const displayFixtures = fixtures.slice(0, 5);
 
   const getTeamCode = (id: number) => {
-    const team = bootstrap.teams.find((t: any) => t.id === id);
+    const team = teams.find((t: any) => t.id === id);
     return team ? team.short_name : 'UNK';
   };
 

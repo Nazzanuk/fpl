@@ -1,6 +1,7 @@
 'use client';
 
 import type { FDRData } from '../../../../Fpl/Services/AnalyticsEngine';
+import { EntityLink } from '../../../../Shared/Components/EntityLink/EntityLink';
 import styles from './FDRPlanner.module.css';
 
 type Props = {
@@ -59,7 +60,13 @@ export const FDRPlannerContent = ({ teams }: Props) => {
               <tr key={team.teamId} className={styles.row} data-rank={idx < 5 ? 'top' : idx >= 15 ? 'bottom' : 'mid'}>
                 <td className={styles.teamCell}>
                   <span className={styles.rank}>{idx + 1}</span>
-                  <span className={styles.teamName}>{team.teamShortName}</span>
+                  <EntityLink
+                    type="team"
+                    id={team.teamId}
+                    label={team.teamShortName}
+                    className={styles.teamName}
+                    variant="inline"
+                  />
                 </td>
                 <td className={styles.avgCell}>
                   <span className={styles.avgValue} data-difficulty={Math.round(team.avgDifficulty)}>

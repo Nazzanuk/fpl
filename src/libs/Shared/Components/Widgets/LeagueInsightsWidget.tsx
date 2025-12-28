@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getBootstrapStatic } from '../../../Fpl/Data/Client/FPLApiClient';
+import { getBootstrapEvents, getBootstrapElements } from '../../../Fpl/Data/Client/BootstrapClient';
 import { getLeagueStats } from '../../../Fpl/Services/StatsService';
 import { StatCard } from './StatCard';
 import styles from './LeagueInsightsWidget.module.css';
@@ -34,11 +34,14 @@ const LeagueInsightsWidgetSkeleton = () => {
 };
 
 const LeagueInsightsWidgetInner = async ({ leagueId }: LeagueInsightsWidgetProps) => {
-  const bootstrap = await getBootstrapStatic();
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current) || bootstrap.events[0];
+  const [events, elements] = await Promise.all([
+    getBootstrapEvents(),
+    getBootstrapElements(),
+  ]);
+  const currentEvent = events.find((e: any) => e.is_current) || events[0];
   const stats = await getLeagueStats(leagueId);
 
-  const getPlayerName = (id: number) => bootstrap.elements.find((e: any) => e.id === id)?.web_name || 'Unknown';
+  const getPlayerName = (id: number) => elements.find((e: any) => e.id === id)?.web_name || 'Unknown';
 
   const renderList = (data: typeof stats.mostCaptained, label: string) => (
     <div className={styles.section}>

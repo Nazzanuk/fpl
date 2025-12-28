@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { Fixture, BootstrapStatic } from '../../../../Fpl/Types';
+import { EntityLink } from '../../../../Shared/Components/EntityLink/EntityLink';
 import styles from './Fixtures.module.css';
 
 type Props = {
@@ -56,6 +57,7 @@ export const FixturesContent = ({ fixtures, teams, events, currentGw }: Props) =
         {events.map(event => (
           <button
             key={event.id}
+            type="button"
             className={styles.gwButton}
             data-active={event.id === selectedGw}
             data-current={event.id === currentGw}
@@ -82,11 +84,23 @@ export const FixturesContent = ({ fixtures, teams, events, currentGw }: Props) =
                 <div key={fixture.id} className={styles.fixture} data-live={fixture.started && !fixture.finished}>
                   <div className={styles.fixtureTeams}>
                     <div className={styles.team} data-winner={hasStarted && (fixture.team_h_score ?? 0) > (fixture.team_a_score ?? 0)}>
-                      <span className={styles.teamName}>{homeTeam?.name}</span>
-                      <span className={styles.teamShort}>{homeTeam?.short_name}</span>
+                      <EntityLink
+                        type="team"
+                        id={fixture.team_h}
+                        label={homeTeam?.name || ''}
+                        teamCode={homeTeam?.code}
+                        className={styles.teamName}
+                      />
+                      <EntityLink
+                        type="team"
+                        id={fixture.team_h}
+                        label={homeTeam?.short_name || ''}
+                        className={styles.teamShort}
+                        variant="inline"
+                      />
                     </div>
 
-                    <div className={styles.score}>
+                    <EntityLink type="fixture" id={fixture.id} label="" className={styles.score}>
                       {hasStarted ? (
                         <>
                           <span className={styles.scoreNum}>{fixture.team_h_score}</span>
@@ -101,11 +115,23 @@ export const FixturesContent = ({ fixtures, teams, events, currentGw }: Props) =
                           {kickoff.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       )}
-                    </div>
+                    </EntityLink>
 
                     <div className={styles.team} data-away data-winner={hasStarted && (fixture.team_a_score ?? 0) > (fixture.team_h_score ?? 0)}>
-                      <span className={styles.teamShort}>{awayTeam?.short_name}</span>
-                      <span className={styles.teamName}>{awayTeam?.name}</span>
+                      <EntityLink
+                        type="team"
+                        id={fixture.team_a}
+                        label={awayTeam?.short_name || ''}
+                        className={styles.teamShort}
+                        variant="inline"
+                      />
+                      <EntityLink
+                        type="team"
+                        id={fixture.team_a}
+                        label={awayTeam?.name || ''}
+                        teamCode={awayTeam?.code}
+                        className={styles.teamName}
+                      />
                     </div>
                   </div>
 

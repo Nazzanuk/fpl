@@ -1,0 +1,80 @@
+.container {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 2rem;
+  background: var(--ink);
+  color: white;
+  border-bottom: 3px solid var(--gold);
+}
+
+.teamInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.shirt {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.statsRow {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.badge {
+  background: var(--surface-dim);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.content {
+  padding: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.squadGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.playerCard {
+  width: 100%;
+}

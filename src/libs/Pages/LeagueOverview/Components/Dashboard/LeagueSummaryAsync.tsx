@@ -6,7 +6,7 @@ import { LeagueSummaryServer } from './LeagueSummaryServer';
 import styles from './Dashboard.module.css';
 
 type Props = {
-  leagueId: number;
+  params: Promise<{ id: string }>;
 };
 
 export const LeagueSummaryAsync = (props: Props) => {
@@ -22,7 +22,7 @@ const LeagueSummarySkeleton = () => (
     <div className={styles.summaryHeader}>
       <div className={styles.skeletonTitle} style={{ height: '24px', width: '200px', backgroundColor: 'var(--surface)', borderRadius: '4px' }} />
     </div>
-    
+
     <div className={styles.summaryGrid}>
       {[1, 2, 3].map(i => (
         <div key={i} className={styles.summaryCard}>
@@ -34,10 +34,13 @@ const LeagueSummarySkeleton = () => (
   </div>
 );
 
-const LeagueSummaryAsyncInner = async ({ leagueId }: Props) => {
-  'use cache'
+const LeagueSummaryAsyncInner = async ({ params }: Props) => {
+  'use cache';
+  const { id } = await params;
+  const leagueId = parseInt(id, 10);
+
   cacheTag('league-summary', `league-${leagueId}`);
-  
+
   const { isLive } = await getGameweekStatus();
   cacheLife(isLive ? 'live' : 'gameweek' as any);
 

@@ -14,7 +14,7 @@ export const DashboardLayout = ({ children, sidePanel, header, leagueId }: Dashb
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.topBar}>
-          <div className={styles.brand}>FPL<span style={{ fontWeight: 300 }}>LIVE</span></div>
+          <div className={styles.brand}>FPL<span style={{ fontWeight: 300 }}>Alchemy</span></div>
           <nav className={styles.nav}>
             <Link href={`/league/${leagueId}`} className={styles.navLink}>Dashboard</Link>
             <Link href={`/league/${leagueId}/players`} className={styles.navLink}>Players</Link>

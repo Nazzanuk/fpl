@@ -1,7 +1,24 @@
-// This page exists for Next.js routing but content is rendered via slots
-// @standings slot renders the standings table
-// @detail slot renders the detail panel (default empty state)
+import styles from "@/libs/Pages/LeagueOverview/Components/Dashboard/Dashboard.module.css";
+import { LeagueSummaryAsync } from "@/libs/Pages/LeagueOverview/Components/Dashboard/LeagueSummaryAsync";
+import { StandingsPage } from "@/libs/Pages/Standings/StandingsPage";
 
-export default function LeaguePage() {
-  return null;
+type PageProps = {
+	params: Promise<{ id: string }>;
+};
+
+export default function LeaguePage({ params }: PageProps) {
+	return (
+		<div className={styles.dashboardGrid}>
+			<section className={styles.standings}>
+				<div className={styles.sectionHeader}>
+					<h2 className={styles.sectionTitle}>Standings</h2>
+				</div>
+				<StandingsPage params={params} />
+			</section>
+
+			<section className={styles.detail}>
+				<LeagueSummaryAsync params={params} />
+			</section>
+		</div>
+	);
 }

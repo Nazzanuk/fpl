@@ -1,12 +1,15 @@
+import Link from 'next/link';
 import styles from './ManagerProfileHeader.module.css';
 
 type Props = {
   managerName: string;
   playerName: string;
   playerRegionCode: string;
+  leagueId: number;
+  managerId: number;
 };
 
-export const ManagerProfileHeader = ({ managerName, playerName, playerRegionCode }: Props) => {
+export const ManagerProfileHeader = ({ managerName, playerName, playerRegionCode, leagueId, managerId }: Props) => {
   return (
     <div className={styles.header}>
       <div className={styles.icon}>
@@ -23,6 +26,13 @@ export const ManagerProfileHeader = ({ managerName, playerName, playerRegionCode
           )}
         </div>
       </div>
+      <Link 
+        href={`/league/${leagueId}/compare/${managerId}`}
+        className={styles.compareBtn}
+      >
+        <span className="material-symbols-sharp">compare_arrows</span>
+        Compare
+      </Link>
     </div>
   );
 };

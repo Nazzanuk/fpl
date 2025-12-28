@@ -1,19 +1,8 @@
-/* ===== PLAYER DETAIL OVERLAY ===== */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 15, 28, 0.9);
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 2rem;
-  overflow-y: auto;
-}
-
 .container {
   width: 100%;
-  max-width: 900px;
+  max-width: 1024px;
+  margin: 0 auto;
+  min-height: 100vh;
   background: var(--surface);
   display: flex;
   flex-direction: column;
@@ -270,9 +259,7 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .overlay {
-    padding: 0;
-  }
+
 
   .container {
     max-width: 100%;

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { PriceChangePlayer } from '../../../../Fpl/Services/AnalyticsEngine';
+import { EntityLink } from '../../../../Shared/Components/EntityLink/EntityLink';
 import styles from './TransferPlanner.module.css';
 
 type Props = {
@@ -22,6 +23,7 @@ export const TransferPlannerContent = ({ rising, falling }: Props) => {
 
       <div className={styles.tabs}>
         <button
+          type="button"
           className={styles.tab}
           data-active={activeTab === 'rising'}
           onClick={() => setActiveTab('rising')}
@@ -30,6 +32,7 @@ export const TransferPlannerContent = ({ rising, falling }: Props) => {
           Rising
         </button>
         <button
+          type="button"
           className={styles.tab}
           data-active={activeTab === 'falling'}
           onClick={() => setActiveTab('falling')}
@@ -54,10 +57,21 @@ export const TransferPlannerContent = ({ rising, falling }: Props) => {
             {players.map(player => (
               <tr key={player.id}>
                 <td className={styles.playerCell}>
-                  <span className={styles.playerName}>{player.webName}</span>
-                  <span className={styles.playerMeta}>
-                    {player.teamShortName} · {player.position}
-                  </span>
+                  <EntityLink
+                    type="player"
+                    id={player.id}
+                    label={player.webName}
+                    className={styles.playerName}
+                  />
+                  <div className={styles.playerMeta}>
+                    <EntityLink
+                      type="team"
+                      id={player.teamId}
+                      label={player.teamShortName}
+                      variant="inline"
+                    />
+                    <span> · {player.position}</span>
+                  </div>
                 </td>
                 <td className={styles.priceCell}>
                   <span className={styles.price}>£{player.currentPrice.toFixed(1)}</span>

@@ -1,0 +1,515 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--surface);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.error {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* Stats Row */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3);
+  background: var(--surface);
+}
+
+.statCard[data-variant="positive"] {
+  border-bottom: 3px solid var(--positive);
+}
+
+.statCard[data-variant="negative"] {
+  border-bottom: 3px solid var(--negative);
+}
+
+.statValue {
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: var(--text);
+  font-feature-settings: "tnum";
+}
+
+.statLabel {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+/* Section Header */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--ink);
+}
+
+.sectionTitle {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: white;
+}
+
+/* ========================================
+   CHART SECTION - Points by Gameweek
+   ======================================== */
+.chartSection {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+}
+
+.chartStats {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.chartStat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.chartStatLabel {
+  font-size: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.chartStatValue {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: white;
+  font-feature-settings: "tnum";
+}
+
+.chartStatValue[data-variant="positive"] {
+  color: var(--positive);
+}
+
+.chartStatValue[data-variant="negative"] {
+  color: var(--negative);
+}
+
+.chartWrapper {
+  display: flex;
+  background: var(--surface-dim);
+  padding: var(--space-3) var(--space-2) var(--space-2) 0;
+  min-height: 200px;
+}
+
+.yAxis {
+  position: relative;
+  width: 32px;
+  flex-shrink: 0;
+}
+
+.yLabel {
+  position: absolute;
+  right: var(--space-1);
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transform: translateY(50%);
+  font-feature-settings: "tnum";
+}
+
+.chart {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.gridLines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.gridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border);
+}
+
+.avgLineMarker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gold);
+  z-index: 1;
+}
+
+.avgLabel {
+  position: absolute;
+  right: 0;
+  top: -14px;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: var(--gold-dark);
+  background: var(--gold);
+  padding: 1px 4px;
+}
+
+.chartBars {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex: 1;
+  gap: 2px;
+  z-index: 2;
+}
+
+.barContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.barWrapper {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bar {
+  width: 100%;
+  max-width: 20px;
+  background: var(--ink-lighter);
+  position: relative;
+  transition: all 0.15s ease;
+  min-height: 4px;
+}
+
+.bar[data-above-avg="true"] {
+  background: var(--ink);
+}
+
+.bar[data-best="true"] {
+  background: var(--positive);
+}
+
+.bar[data-worst="true"] {
+  background: var(--negative);
+}
+
+.bar:hover {
+  background: var(--gold);
+}
+
+.barValue {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  color: var(--text);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}
+
+.bar:hover .barValue {
+  opacity: 1;
+}
+
+.barLabel {
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+  font-feature-settings: "tnum";
+}
+
+.chartLegend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-2);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  background: var(--ink-lighter);
+}
+
+.legendDot[data-type="above"] {
+  background: var(--ink);
+}
+
+.legendDot[data-type="below"] {
+  background: var(--ink-lighter);
+}
+
+.legendLine {
+  width: 12px;
+  height: 2px;
+  background: var(--gold);
+}
+
+.legendText {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ========================================
+   CHIPS SECTION
+   ======================================== */
+.chipsSection {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+}
+
+.chipsCount {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.chipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+
+.chipCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--surface);
+  transition: background 0.15s ease;
+}
+
+.chipCard[data-used="true"] {
+  background: var(--surface-dim);
+}
+
+.chipHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chipBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.chipBadge[data-used="true"] {
+  background: var(--ink-lighter);
+  color: var(--text-muted);
+}
+
+.chipStatus {
+  display: flex;
+  align-items: center;
+}
+
+.chipUsedBadge {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  background: var(--ink);
+  color: white;
+  padding: 2px 6px;
+  font-feature-settings: "tnum";
+}
+
+.chipAvailableBadge {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  color: var(--positive);
+  letter-spacing: 0.04em;
+}
+
+.chipInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chipName {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.chipDesc {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ========================================
+   TABLE SECTION
+   ======================================== */
+.tableSection {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.table th {
+  padding: var(--space-2) var(--space-2);
+  text-align: left;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  background: var(--surface-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+.table td {
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--surface-muted);
+  font-feature-settings: "tnum";
+  color: var(--text-secondary);
+}
+
+.table tr:hover td {
+  background: var(--surface-dim);
+}
+
+.gwCell {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pointsCell {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.negative {
+  color: var(--negative);
+}
+
+/* ========================================
+   SKELETON STATES
+   ======================================== */
+.skeletonTitle {
+  width: 150px;
+  height: 24px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonSubtitle {
+  width: 100px;
+  height: 14px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonStat {
+  height: 72px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonChart {
+  height: 180px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonTable {
+  height: 200px;
+  background: var(--surface-muted);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

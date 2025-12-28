@@ -18,29 +18,27 @@ type Props = {
 export const PlayerDetailContent = ({ player, leagueId }: Props) => {
   const router = useRouter();
 
-  const handleClose = () => {
+  const handleBack = () => {
     router.back();
   };
 
   const handleSelectManager = (managerId: number) => {
-    router.push(`/league/${leagueId}?manager=${managerId}`);
+    router.push(`/league/${leagueId}/manager/${managerId}`);
   };
 
   return (
-    <div className={styles.overlay} onClick={handleClose}>
-      <div className={styles.container} onClick={e => e.stopPropagation()}>
-        <PlayerHeader player={player} onClose={handleClose} />
-        <PlayerLiveStats player={player} />
-        <div className={styles.content}>
-          <PlayerFixtures fixtures={player.fixtures} />
-          <PlayerHistory history={player.history} />
-          <PlayerSeasonStats player={player} />
-          <PlayerLeagueOwnership
-            ownership={player.leagueOwnership}
-            onSelectManager={handleSelectManager}
-            onClose={handleClose}
-          />
-        </div>
+    <div className={styles.container}>
+      <PlayerHeader player={player} onClose={handleBack} />
+      <PlayerLiveStats player={player} />
+      <div className={styles.content}>
+        <PlayerFixtures fixtures={player.fixtures} />
+        <PlayerHistory history={player.history} />
+        <PlayerSeasonStats player={player} />
+        <PlayerLeagueOwnership
+          ownership={player.leagueOwnership}
+          onSelectManager={handleSelectManager}
+          onClose={handleBack}
+        />
       </div>
     </div>
   );

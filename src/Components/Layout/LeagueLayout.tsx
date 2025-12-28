@@ -14,7 +14,7 @@ export const LeagueLayout = ({ children, leagueId }: LeagueLayoutProps) => {
       <header className={styles.header}>
         <div className={styles.topBar}>
           <Link href="/" className={styles.brand}>
-            FPL<span>Live</span>
+            FPL<span>Alchemy</span>
           </Link>
           
           <div className={styles.liveIndicator}>

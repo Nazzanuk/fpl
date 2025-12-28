@@ -55,6 +55,7 @@ export interface PlayerFixture {
   readonly eventId: number;
   readonly eventName: string;
   readonly opponent: string;
+  readonly opponentId: number;
   readonly opponentShort: string;
   readonly isHome: boolean;
   readonly difficulty: number;
@@ -114,6 +115,7 @@ export interface PlayerSeasonHistory {
 export interface PlayerStatSummary {
   readonly id: number;
   readonly webName: string;
+  readonly teamId: number;
   readonly teamName: string;
   readonly teamShortName: string;
   readonly position: string;

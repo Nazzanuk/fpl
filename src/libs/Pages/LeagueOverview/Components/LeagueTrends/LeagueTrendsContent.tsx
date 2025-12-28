@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { LeagueTrend } from '../../../../Fpl/Services/AnalyticsEngine';
+import { EntityLink } from '../../../../Shared/Components/EntityLink/EntityLink';
 import styles from './LeagueTrends.module.css';
 
 type Props = {
@@ -241,7 +242,12 @@ export const LeagueTrendsContent = ({ trends }: Props) => {
                 onClick={() => toggleManager(trend.managerId)}
               >
                 <span className={styles.legendColor} style={{ background: color }} />
-                <span className={styles.legendName}>{trend.managerName}</span>
+                <EntityLink
+                  type="manager"
+                  id={trend.managerId}
+                  label={trend.managerName}
+                  className={styles.legendName}
+                />
                 <span className={styles.legendStats}>
                   <span className={styles.legendRank}>#{idx + 1}</span>
                   <span className={styles.legendPoints}>{latestGw?.totalPoints.toLocaleString()}</span>

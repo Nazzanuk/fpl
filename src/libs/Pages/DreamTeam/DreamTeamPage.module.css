@@ -1,0 +1,28 @@
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--surface-dim);
+}
+
+.skeleton {
+  flex: 1;
+  background: linear-gradient(
+    90deg,
+    var(--surface-dim) 0%,
+    var(--surface-muted) 50%,
+    var(--surface-dim) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

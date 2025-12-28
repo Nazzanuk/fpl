@@ -4,6 +4,7 @@ import { ManagerProfileHeader } from './ManagerProfileHeader';
 import { ManagerStats } from './ManagerStats';
 import { GameweekStats } from './GameweekStats';
 import { MiniPitch } from './MiniPitch';
+import { ManagerHistory } from './ManagerHistory';
 import { ManagerTransfers } from './ManagerTransfers';
 import styles from './ManagerPanel.module.css';
 
@@ -43,6 +44,8 @@ const ManagerPanelInner = async ({ leagueId, managerId }: Props) => {
         managerName={detail.managerName}
         playerName={detail.playerName}
         playerRegionCode={detail.playerRegionCode}
+        leagueId={leagueId}
+        managerId={managerId}
       />
       <div className={styles.columns}>
         <div className={styles.leftColumn}>
@@ -70,6 +73,7 @@ const ManagerPanelInner = async ({ leagueId, managerId }: Props) => {
       {detail.transferCost > 0 && (
         <div className={styles.transferCost}>{detail.transferCost} pts transfer cost</div>
       )}
+      <ManagerHistory history={detail.history} />
       <ManagerTransfers transfers={detail.recentTransfers} />
     </div>
   );

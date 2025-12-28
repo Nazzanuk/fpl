@@ -1,0 +1,55 @@
+.container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-left: auto;
+  margin-right: 1.5rem;
+}
+
+.selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select {
+  appearance: none;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  background: var(--ink-light);
+  border: 1px solid var(--ink-lighter);
+  color: white;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 200px;
+  border-radius: 0; /* Sharp corners per DESIGN.md */
+  transition: all 0.2s ease;
+  
+  /* Custom dropdown arrow from DESIGN.md */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
+
+.select:hover {
+  border-color: var(--gold);
+  background: var(--ink-lighter);
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2); /* Gold glow */
+}
+
+/* Hide fallback icon since we use background-image */
+.icon {
+  display: none;
+}
+
+.option {
+  background: var(--ink);
+  color: white;
+  padding: 0.5rem;
+}

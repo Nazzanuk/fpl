@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import type { BestXI, RecommendedTransfer } from '../../../../Fpl/Services/RecommendationEngine';
 import type { PlayerStatSummary } from '../../../../Fpl/Types';
+import { EntityLink } from '../../../../Shared/Components/EntityLink/EntityLink';
 import styles from './BestXI.module.css';
 
 type Props = {
@@ -39,12 +40,14 @@ export const BestXIView = ({ bestXI, recommendations, managerTeam, defaultMode }
            {managerTeam && (
              <div className={styles.toggleContainer}>
                <button 
+                 type="button"
                  className={`${styles.toggleBtn} ${viewMode === 'dream' ? styles.active : ''}`}
                  onClick={() => setViewMode('dream')}
                >
                  Dream Team
                </button>
                <button 
+                 type="button"
                  className={`${styles.toggleBtn} ${viewMode === 'manager' ? styles.active : ''}`}
                  onClick={() => setViewMode('manager')}
                >
@@ -123,17 +126,27 @@ export const BestXIView = ({ bestXI, recommendations, managerTeam, defaultMode }
               </div>
               {recommendations.map((rec, i) => (
                 <div 
-                  key={i} 
+                  key={`${rec.playerOut.id}-${rec.playerIn.id}`} 
                   className={`${styles.recRow} ${rec.costDiff <= 0 ? styles.recRowValue : ''}`}
                 >
                   <span className={styles.colRank}>{i + 1}</span>
                   <span className={styles.colOut}>
-                    <span className={styles.playerName}>{rec.playerOut.webName}</span>
+                    <EntityLink
+                      type="player"
+                      id={rec.playerOut.id}
+                      label={rec.playerOut.webName}
+                      className={styles.playerName}
+                    />
                     <span className={styles.playerSS}>{rec.playerOut.trimean.toFixed(1)}</span>
                   </span>
                   <span className={styles.colArrow}>→</span>
                   <span className={styles.colIn}>
-                    <span className={styles.playerName}>{rec.playerIn.webName}</span>
+                    <EntityLink
+                      type="player"
+                      id={rec.playerIn.id}
+                      label={rec.playerIn.webName}
+                      className={styles.playerName}
+                    />
                     <span className={styles.playerSS}>{rec.playerIn.trimean.toFixed(1)}</span>
                   </span>
                   <span className={`${styles.colGain} ${styles.positive}`}>
@@ -164,7 +177,12 @@ const PlayerNode = ({ player, isDiff }: { player: PlayerStatSummary & { gwPoints
        <div className={`${styles.shirt} ${styles['team-' + player.teamShortName]}`} />
     </div>
     <div className={styles.playerInfo}>
-      <span className={styles.playerName}>{player.webName}</span>
+      <EntityLink
+        type="player"
+        id={player.id}
+        label={player.webName}
+        className={styles.playerName}
+      />
       <span className={styles.playerPoints}>
         {player.gwPoints != null ? player.gwPoints : player.trimean.toFixed(2)}
         {player.gwPoints != null && <span className={styles.trimeanSub}> ({player.trimean.toFixed(1)})</span>}

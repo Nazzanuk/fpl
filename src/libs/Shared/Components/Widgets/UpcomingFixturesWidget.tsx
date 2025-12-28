@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import { getBootstrapStatic, getAllFixtures } from '../../../Fpl/Data/Client/FPLApiClient';
+import { getAllFixtures } from '../../../Fpl/Data/Client/FPLApiClient';
+import { getBootstrapEvents, getBootstrapTeams } from '../../../Fpl/Data/Client/BootstrapClient';
 import { StatCard } from './StatCard';
 import styles from './UpcomingFixturesWidget.module.css';
 
@@ -24,8 +25,11 @@ const UpcomingFixturesWidgetSkeleton = () => {
 };
 
 const UpcomingFixturesWidgetInner = async () => {
-  const bootstrap = await getBootstrapStatic();
-  const nextEvent = bootstrap.events.find((e: any) => e.is_next);
+  const [events, teams] = await Promise.all([
+    getBootstrapEvents(),
+    getBootstrapTeams(),
+  ]);
+  const nextEvent = events.find((e: any) => e.is_next);
 
   if (!nextEvent) {
     return <StatCard title="Upcoming"><div className={styles.empty}>Season Finished</div></StatCard>;
@@ -33,7 +37,6 @@ const UpcomingFixturesWidgetInner = async () => {
 
   const allFixtures = await getAllFixtures();
   const fixtures = allFixtures.filter((f: any) => f.event === nextEvent.id);
-  const teams = bootstrap.teams;
   const getTeamName = (id: number) => teams.find((t: any) => t.id === id)?.short_name || 'UNK';
 
   // Show first 5

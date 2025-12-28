@@ -1,0 +1,259 @@
+/* ===== PREMIUM STANDINGS TABLE ===== */
+.list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  background: var(--surface);
+  scrollbar-gutter: stable;
+}
+
+/* Header Row */
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 3.5rem 3.5rem 4rem; /* Pos | Team | SS | GW | Total */
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--ink);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 3px solid var(--gold);
+}
+
+.tableHeaderCell {
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+}
+
+.tableHeaderCell.alignRight {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+/* Manager Row */
+.row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 3.5rem 3.5rem 4rem;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.375rem 1rem; /* Ultra-dense padding */
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  height: 3.5rem; /* Fixed compact height */
+  transition: background 0.1s ease;
+}
+
+.row:hover {
+  background: var(--surface-muted);
+}
+
+.row.selected {
+  background: var(--surface-dim);
+  border-left: 3px solid var(--gold);
+  padding-left: calc(1rem - 3px); /* Compensate for border */
+}
+
+/* Rank Cell */
+.rank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  width: 1.5rem;
+}
+
+.rankNum {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--text-muted); /* Default for lower ranks */
+  font-feature-settings: "tnum";
+  letter-spacing: -0.05em;
+}
+
+/* Gold highlighting for Top 3 */
+.row:nth-of-type(1) .rankNum,
+.row:nth-of-type(2) .rankNum,
+.row:nth-of-type(3) .rankNum {
+  color: var(--gold);
+}
+
+/* Movement Arrows */
+.movement {
+  margin-top: 2px;
+  font-size: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.up { color: var(--positive); }
+.down { color: var(--negative); }
+
+/* Info Cell */
+.info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  gap: 0.125rem;
+}
+
+.managerName {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+   letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.playerName {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Chip Badge */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1rem;
+  padding: 0 0.25rem;
+  background: var(--ink);
+  color: var(--gold);
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 0; /* Sharp corners */
+}
+
+/* Points Cells */
+.points {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.gwPoints {
+  font-size: 1rem; 
+  font-weight: 800;
+  color: var(--text);
+  font-feature-settings: "tnum";
+  line-height: 1;
+}
+
+.gwLabel {
+  font-size: 0.4375rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* Secret Sauce Column Specifics */
+.ssColumn .gwPoints {
+  color: var(--ink-light); /* Slightly softer than main points */
+  font-weight: 700;
+}
+
+/* Total Points Cell */
+.total {
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.totalPoints {
+  font-size: 1.125rem; /* Larger emphasis */
+  font-weight: 800;
+  color: var(--ink); /* Darkest black */
+  font-feature-settings: "tnum";
+  letter-spacing: -0.02em;
+}
+
+/* Transfer Cost Indicator */
+.transferCost {
+  font-size: 0.5rem;
+  color: var(--negative);
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+/* ===== SKELETON STATES ===== */
+.skeletonRow {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 3.5rem 3.5rem 4rem;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.375rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  height: 3.5rem;
+}
+
+.skeletonRank,
+.skeletonInfo,
+.skeletonPoints,
+.skeletonTotal {
+  background: linear-gradient(
+    90deg,
+    var(--surface-muted) 0%,
+    var(--surface-dim) 50%,
+    var(--surface-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeletonRank {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0 auto;
+}
+
+.skeletonInfo {
+  height: 2rem;
+}
+
+.skeletonPoints {
+  height: 1.5rem;
+  margin-left: auto;
+  width: 2rem;
+}
+
+.skeletonTotal {
+  height: 1.5rem;
+  margin-left: auto;
+  width: 2.5rem;
+}

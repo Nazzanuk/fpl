@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { TopPlayer } from '../../../../Fpl/Services/AnalyticsEngine';
+import { EntityLink } from '../../../../Shared/Components/EntityLink/EntityLink';
 import styles from './TopPerformers.module.css';
 
 type Props = {
@@ -38,6 +39,7 @@ export const TopPerformersContent = ({ data }: Props) => {
 
       <div className={styles.tabs}>
         <button
+          type="button"
           className={styles.tab}
           data-active={activeTab === 'points'}
           onClick={() => setActiveTab('points')}
@@ -45,6 +47,7 @@ export const TopPerformersContent = ({ data }: Props) => {
           By Points
         </button>
         <button
+          type="button"
           className={styles.tab}
           data-active={activeTab === 'form'}
           onClick={() => setActiveTab('form')}
@@ -52,6 +55,7 @@ export const TopPerformersContent = ({ data }: Props) => {
           By Form
         </button>
         <button
+          type="button"
           className={styles.tab}
           data-active={activeTab === 'value'}
           onClick={() => setActiveTab('value')}
@@ -59,6 +63,7 @@ export const TopPerformersContent = ({ data }: Props) => {
           Best Value
         </button>
         <button
+          type="button"
           className={styles.tab}
           data-active={activeTab === 'differentials'}
           onClick={() => setActiveTab('differentials')}
@@ -86,10 +91,21 @@ export const TopPerformersContent = ({ data }: Props) => {
               <tr key={player.id}>
                 <td className={styles.rankCell}>{idx + 1}</td>
                 <td className={styles.playerCell}>
-                  <span className={styles.playerName}>{player.webName}</span>
-                  <span className={styles.playerMeta}>
-                    {player.teamShortName} · {player.position}
-                  </span>
+                  <EntityLink
+                    type="player"
+                    id={player.id}
+                    label={player.webName}
+                    className={styles.playerName}
+                  />
+                  <div className={styles.playerMeta}>
+                    <EntityLink
+                      type="team"
+                      id={player.teamId}
+                      label={player.teamShortName}
+                      variant="inline"
+                    />
+                    <span> · {player.position}</span>
+                  </div>
                 </td>
                 <td className={styles.priceCell}>£{player.price.toFixed(1)}</td>
                 <td className={styles.pointsCell}>{player.totalPoints}</td>

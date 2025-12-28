@@ -6,9 +6,10 @@ type Props = {
   team: ManagerTeamPayload;
   liveStats: Map<number, LiveElementStats>;
   bootstrap: BootstrapStatic;
+  leagueId: number;
 };
 
-export const PitchView = ({ team, liveStats, bootstrap }: Props) => {
+export const PitchView = ({ team, liveStats, bootstrap, leagueId }: Props) => {
   const getPlayerDetails = (elementId: number) => {
     const element = bootstrap.elements.find((e) => e.id === elementId);
     const teamObj = bootstrap.teams.find((t) => t.id === element?.team);
@@ -45,6 +46,8 @@ export const PitchView = ({ team, liveStats, bootstrap }: Props) => {
         {gkp.map((p) => (
           <PlayerCard
             key={p.element}
+            id={p.element}
+            leagueId={leagueId}
             name={p.name}
             points={p.points}
             teamCode={p.teamCode}
@@ -58,6 +61,8 @@ export const PitchView = ({ team, liveStats, bootstrap }: Props) => {
         {def.map((p) => (
           <PlayerCard
             key={p.element}
+            id={p.element}
+            leagueId={leagueId}
             name={p.name}
             points={p.points}
             teamCode={p.teamCode}
@@ -71,6 +76,8 @@ export const PitchView = ({ team, liveStats, bootstrap }: Props) => {
         {mid.map((p) => (
           <PlayerCard
             key={p.element}
+            id={p.element}
+            leagueId={leagueId}
             name={p.name}
             points={p.points}
             teamCode={p.teamCode}
@@ -84,6 +91,8 @@ export const PitchView = ({ team, liveStats, bootstrap }: Props) => {
         {fwd.map((p) => (
           <PlayerCard
             key={p.element}
+            id={p.element}
+            leagueId={leagueId}
             name={p.name}
             points={p.points}
             teamCode={p.teamCode}
@@ -98,6 +107,8 @@ export const PitchView = ({ team, liveStats, bootstrap }: Props) => {
         {bench.map((p) => (
           <PlayerCard
             key={p.element}
+            id={p.element}
+            leagueId={leagueId}
             name={p.name}
             points={p.points}
             teamCode={p.teamCode}

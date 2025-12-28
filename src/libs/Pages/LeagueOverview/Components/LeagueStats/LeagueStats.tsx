@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { getLeagueStats } from '../../../../Fpl/Services/StatsService';
-import { getBootstrapStatic } from '../../../../Fpl/Data/Client/FPLApiClient';
+import { getBootstrapEvents, getBootstrapElements, getBootstrapTeams } from '../../../../Fpl/Data/Client/BootstrapClient';
 import styles from './LeagueStats.module.css';
 
 type LeagueStatsProps = {
@@ -20,29 +20,33 @@ const LeagueStatsSkeleton = () => {
 };
 
 const LeagueStatsInner = async ({ leagueId }: LeagueStatsProps) => {
-  const bootstrap = await getBootstrapStatic();
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current);
+  const [events, elements, teams] = await Promise.all([
+    getBootstrapEvents(),
+    getBootstrapElements(),
+    getBootstrapTeams(),
+  ]);
+  const currentEvent = events.find((e: any) => e.is_current);
   const currentGw = currentEvent ? currentEvent.id : 38;
 
   const stats = await getLeagueStats(leagueId);
 
   // Helper to get player name
   const getPlayerName = (id: number) => {
-    const player = bootstrap.elements.find((e: any) => e.id === id);
+    const player = elements.find((e: any) => e.id === id);
     return player ? player.web_name : `Player ${id}`;
   };
 
   // Helper to get player team
   const getPlayerTeam = (id: number) => {
-    const player = bootstrap.elements.find((e: any) => e.id === id);
+    const player = elements.find((e: any) => e.id === id);
     if (!player) return '';
-    const team = bootstrap.teams.find((t: any) => t.id === player.team);
+    const team = teams.find((t: any) => t.id === player.team);
     return team ? team.short_name : '';
   };
 
   // Helper to get player image url (simplified)
   const getPlayerImage = (id: number) => {
-     const player = bootstrap.elements.find((e: any) => e.id === id);
+     const player = elements.find((e: any) => e.id === id);
      // FPL uses a specific ID format for images, usually code.png or id.png
      // For now, we'll use a placeholder or just the name.
      // The provided images show player faces, which come from `https://resources.premierleague.com/premierleague/photos/players/110x140/p{code}.png`

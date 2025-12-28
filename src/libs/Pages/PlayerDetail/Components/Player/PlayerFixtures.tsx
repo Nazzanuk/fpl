@@ -1,4 +1,5 @@
 import type { PlayerDetail } from '../../../../Fpl/Types';
+import { EntityLink } from '../../../../Shared/Components/EntityLink/EntityLink';
 import styles from './PlayerFixtures.module.css';
 
 type Props = {
@@ -19,7 +20,13 @@ export const PlayerFixtures = ({ fixtures }: Props) => {
             <div key={fixture.eventId} className={styles.fixture}>
               <span className={styles.gameweek}>{fixture.eventName}</span>
               <div className={styles.opponent}>
-                <span className={styles.opponentName}>{fixture.opponentShort}</span>
+                <EntityLink
+                  type="team"
+                  id={fixture.opponentId}
+                  label={fixture.opponentShort}
+                  className={styles.opponentName}
+                  variant="inline"
+                />
                 <span className={styles.venue} data-home={fixture.isHome}>
                   {fixture.isHome ? 'H' : 'A'}
                 </span>

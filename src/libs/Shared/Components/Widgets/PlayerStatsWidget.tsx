@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import { getBootstrapStatic, getEventLive } from '../../../Fpl/Data/Client/FPLApiClient';
+import { getEventLive } from '../../../Fpl/Data/Client/FPLApiClient';
+import { getBootstrapEvents, getBootstrapElements, getBootstrapTeams } from '../../../Fpl/Data/Client/BootstrapClient';
 import type { LiveElementStats } from '../../../Fpl/Types';
 import { StatCard } from './StatCard';
 import { PlayerStatsClient } from './PlayerStatsClient';
@@ -26,8 +27,12 @@ const PlayerStatsWidgetSkeleton = () => {
 };
 
 const PlayerStatsWidgetInner = async () => {
-  const bootstrap = await getBootstrapStatic();
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current) || bootstrap.events[0]; // Fallback
+  const [events, elements, teams] = await Promise.all([
+    getBootstrapEvents(),
+    getBootstrapElements(),
+    getBootstrapTeams(),
+  ]);
+  const currentEvent = events.find((e: any) => e.is_current) || events[0]; // Fallback
   const currentGw = currentEvent.id;
   const previousGw = currentGw > 1 ? currentGw - 1 : null;
 
@@ -41,8 +46,8 @@ const PlayerStatsWidgetInner = async () => {
 
     return liveData.elements
       .map((stats: any) => {
-        const player = bootstrap.elements.find((e: any) => e.id === stats.id);
-        const team = bootstrap.teams.find((t: any) => t.id === player?.team);
+        const player = elements.find((e: any) => e.id === stats.id);
+        const team = teams.find((t: any) => t.id === player?.team);
         return {
           id: stats.id,
           name: player?.web_name || 'Unknown',

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { cacheLife, cacheTag } from 'next/cache';
 import { getBestXI, getTransferRecommendations, getPlayerStatsAggregate } from '../../../../Fpl/Services/FPLEngine';
 import { getManagerPicks } from '../../../../Fpl/Data/Client/FPLApiClient';
-import { getBootstrapStatic } from '../../../../Fpl/Data/Client/FPLApiClient';
+import { getBootstrapEvents } from '../../../../Fpl/Data/Client/BootstrapClient';
 import { BestXIView } from './BestXI';
 import styles from './BestXI.module.css';
 
@@ -45,8 +45,8 @@ const BestXIAsyncInner = async ({ leagueId, managerId, mode }: Props) => {
   cacheLife('gameweek');
 
   // 1. Fetch Bootstrap for current GW info
-  const bootstrap = await getBootstrapStatic();
-  const currentGw = bootstrap.events.find((e: any) => e.is_current);
+  const events = await getBootstrapEvents();
+  const currentGw = events.find((e: any) => e.is_current);
   
   // Use current GW for picks - next GW picks don't exist until deadline passes
   const eventForPicks = currentGw?.id || 1;

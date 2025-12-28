@@ -1,0 +1,43 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--surface);
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: var(--surface-dim);
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.skeletonTable {
+  width: 100%;
+}
+
+.skeletonHeader {
+  height: 3rem;
+  background: var(--ink);
+  margin-bottom: 1px;
+}
+
+.skeletonRow {
+  height: 3.5rem;
+  background: var(--surface-light);
+  margin-bottom: 1px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

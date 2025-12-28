@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import { getBootstrapStatic, getAllFixtures } from '../../../Fpl/Data/Client/FPLApiClient';
+import { getAllFixtures } from '../../../Fpl/Data/Client/FPLApiClient';
+import { getBootstrapEvents, getBootstrapTeams } from '../../../Fpl/Data/Client/BootstrapClient';
 import { StatCard } from './StatCard';
 import styles from './LiveMatchesWidget.module.css';
 
@@ -24,8 +25,11 @@ const LiveMatchesWidgetSkeleton = () => {
 };
 
 const LiveMatchesWidgetInner = async () => {
-  const bootstrap = await getBootstrapStatic();
-  const currentEvent = bootstrap.events.find((e: any) => e.is_current);
+  const [events, teams] = await Promise.all([
+    getBootstrapEvents(),
+    getBootstrapTeams(),
+  ]);
+  const currentEvent = events.find((e: any) => e.is_current);
 
   if (!currentEvent) {
     return (
@@ -37,7 +41,6 @@ const LiveMatchesWidgetInner = async () => {
 
   const allFixtures = await getAllFixtures();
   const fixtures = allFixtures.filter((f: any) => f.event === currentEvent.id);
-  const teams = bootstrap.teams;
 
   const getTeamName = (id: number) => teams.find((t: any) => t.id === id)?.short_name || 'UNK';
 

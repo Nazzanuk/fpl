@@ -1,5 +1,4 @@
-'use client';
-
+import Link from 'next/link';
 import styles from './MatchTicker.module.css';
 
 type Fixture = {
@@ -15,9 +14,10 @@ type Fixture = {
 
 type Props = {
   fixtures: Fixture[];
+  leagueId: number;
 };
 
-export const MatchTicker = ({ fixtures }: Props) => {
+export const MatchTicker = ({ fixtures, leagueId }: Props) => {
   const sorted = [...fixtures].sort((a, b) => {
     const order = { live: 0, upcoming: 1, finished: 2 };
     return order[a.status] - order[b.status];
@@ -27,8 +27,9 @@ export const MatchTicker = ({ fixtures }: Props) => {
     <div className={styles.ticker}>
       <div className={styles.track}>
         {sorted.map(fixture => (
-          <div
+          <Link
             key={fixture.id}
+            href={`/league/${leagueId}/fixture/${fixture.id}`}
             className={`${styles.match} ${styles[fixture.status]}`}
           >
             <span className={`${styles.team} ${styles.home}`}>{fixture.homeTeam}</span>
@@ -43,7 +44,7 @@ export const MatchTicker = ({ fixtures }: Props) => {
               </span>
             </div>
             <span className={`${styles.team} ${styles.away}`}>{fixture.awayTeam}</span>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
